@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -20,8 +21,23 @@ export default {
           900: '#1e3a8a',
         },
       },
+      boxShadow: {
+        focus: '0 0 0 3px rgba(59, 130, 246, 0.5)',
+      },
+      transitionProperty: {
+        'colors': 'color, background-color, border-color, text-decoration-color, fill, stroke',
+      },
     },
   },
-  plugins: [],
+  plugins: [
+    function ({ addBase }) {
+      addBase({
+        'input:focus, textarea:focus, select:focus, button:focus': {
+          outline: 'none',
+          boxShadow: '0 0 0 3px rgba(59, 130, 246, 0.5)',
+        },
+      });
+    },
+  ],
 }
 

@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,11 +28,11 @@ public class SavedJobServiceImpl implements SavedJobService {
 	@Override
 	public SavedJob saveJob(String jobId, User user) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		// Check if already saved
 		if (savedJobRepository.findByUserIdAndJobId(user, job).isPresent()) {
-			throw new RuntimeException("Job is already saved");
+			   throw new JobPortalException("Job is already saved");
 		}
 		
 		SavedJob savedJob = new SavedJob();
@@ -44,7 +46,7 @@ public class SavedJobServiceImpl implements SavedJobService {
 	@Override
 	public void unsaveJob(String jobId, User user) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		savedJobRepository.deleteByUserIdAndJobId(user, job);
 	}
@@ -52,7 +54,7 @@ public class SavedJobServiceImpl implements SavedJobService {
 	@Override
 	public boolean isJobSaved(String jobId, User user) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		return savedJobRepository.findByUserIdAndJobId(user, job).isPresent();
 	}

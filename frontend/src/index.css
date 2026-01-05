@@ -9,10 +9,29 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #f9fafb;
+  color: #1e293b;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+.dark body {
+  background-color: #18181b;
+  color: #f3f4f6;
+}
+
+/* Improve focus ring for accessibility */
+input:focus, textarea:focus, select:focus, button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5);
+}
+
+/* Smooth transitions for interactive elements */
+a, button, input, select, textarea {
+  transition: color 0.2s, background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 

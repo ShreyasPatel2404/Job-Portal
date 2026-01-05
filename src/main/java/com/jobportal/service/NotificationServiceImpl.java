@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,11 +45,11 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public Notification markAsRead(String notificationId, User user) {
 		Notification notification = notificationRepository.findById(notificationId)
-				.orElseThrow(() -> new RuntimeException("Notification not found"));
+				   .orElseThrow(() -> new JobPortalException("Notification not found"));
 		
 		// Verify ownership
 		if (!notification.getUserId().getId().equals(user.getId())) {
-			throw new RuntimeException("You don't have permission to access this notification");
+			   throw new JobPortalException("You don't have permission to access this notification");
 		}
 		
 		notification.setRead(true);
@@ -66,11 +68,11 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public void deleteNotification(String notificationId, User user) {
 		Notification notification = notificationRepository.findById(notificationId)
-				.orElseThrow(() -> new RuntimeException("Notification not found"));
+				   .orElseThrow(() -> new JobPortalException("Notification not found"));
 		
 		// Verify ownership
 		if (!notification.getUserId().getId().equals(user.getId())) {
-			throw new RuntimeException("You don't have permission to delete this notification");
+			   throw new JobPortalException("You don't have permission to delete this notification");
 		}
 		
 		notificationRepository.delete(notification);

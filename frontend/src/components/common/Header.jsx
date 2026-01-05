@@ -26,10 +26,15 @@ const Header = () => {
 
             {isAuthenticated ? (
               <>
+                {user?.accountType === 'ADMIN' && (
+                  <Link to="/dashboard/admin" className="text-gray-700 hover:text-primary-600">
+                    Admin Dashboard
+                  </Link>
+                )}
                 {user?.accountType === 'EMPLOYER' && (
                   <>
                     <Link to="/dashboard/recruiter" className="text-gray-700 hover:text-primary-600">
-                      Dashboard
+                      Employer Dashboard
                     </Link>
                     <Link to="/jobs/post" className="text-gray-700 hover:text-primary-600">
                       Post Job
@@ -39,18 +44,22 @@ const Header = () => {
                 {user?.accountType === 'APPLICANT' && (
                   <>
                     <Link to="/dashboard/jobseeker" className="text-gray-700 hover:text-primary-600">
-                      Dashboard
+                      Job Seeker Dashboard
                     </Link>
                     <Link to="/applications" className="text-gray-700 hover:text-primary-600">
                       Applications
                     </Link>
                   </>
                 )}
-                {user?.accountType === 'ADMIN' && (
-                  <Link to="/dashboard/admin" className="text-gray-700 hover:text-primary-600">
-                    Admin Panel
-                  </Link>
-                )}
+                <Link to="/saved-jobs" className="text-gray-700 hover:text-primary-600">
+                  Saved Jobs
+                </Link>
+                <Link to="/companies/1/reviews" className="text-gray-700 hover:text-primary-600">
+                  Company Reviews
+                </Link>
+                <Link to="/notifications" className="text-gray-700 hover:text-primary-600">
+                  Notifications
+                </Link>
                 <Link to="/profile" className="text-gray-700 hover:text-primary-600">
                   Profile
                 </Link>

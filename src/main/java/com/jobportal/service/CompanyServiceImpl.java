@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 
@@ -19,7 +21,7 @@ public class CompanyServiceImpl implements CompanyService {
 	public Company createCompanyProfile(Company company, User recruiter) {
 		// Check if company profile already exists
 		if (companyRepository.findByRecruiterId(recruiter).isPresent()) {
-			throw new RuntimeException("Company profile already exists");
+			   throw new JobPortalException("Company profile already exists");
 		}
 		
 		company.setRecruiterId(recruiter);
@@ -32,7 +34,7 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	public Company updateCompanyProfile(Company company, User recruiter) {
 		Company existing = companyRepository.findByRecruiterId(recruiter)
-				.orElseThrow(() -> new RuntimeException("Company profile not found"));
+				   .orElseThrow(() -> new JobPortalException("Company profile not found"));
 		
 		// Update fields
 		existing.setCompanyName(company.getCompanyName());
@@ -55,13 +57,13 @@ public class CompanyServiceImpl implements CompanyService {
 	@Override
 	public Company getCompanyProfile(User recruiter) {
 		return companyRepository.findByRecruiterId(recruiter)
-				.orElseThrow(() -> new RuntimeException("Company profile not found"));
+				   .orElseThrow(() -> new JobPortalException("Company profile not found"));
 	}
 
 	@Override
 	public Company getCompanyById(String companyId) {
 		return companyRepository.findById(companyId)
-				.orElseThrow(() -> new RuntimeException("Company not found"));
+				   .orElseThrow(() -> new JobPortalException("Company not found"));
 	}
 }
 

@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,7 +43,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public Resume getResumeById(String resumeId, User user) {
 		Resume resume = resumeRepository.findByIdAndUserId(resumeId, user)
-				.orElseThrow(() -> new RuntimeException("Resume not found"));
+				   .orElseThrow(() -> new JobPortalException("Resume not found"));
 		return resume;
 	}
 
@@ -53,7 +55,7 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public Resume setAsDefault(String resumeId, User user) {
 		Resume resume = resumeRepository.findByIdAndUserId(resumeId, user)
-				.orElseThrow(() -> new RuntimeException("Resume not found"));
+				   .orElseThrow(() -> new JobPortalException("Resume not found"));
 		
 		// Unset all other defaults
 		resumeRepository.findByUserId(user).forEach(r -> {
@@ -70,13 +72,13 @@ public class ResumeServiceImpl implements ResumeService {
 	@Override
 	public Resume getDefaultResume(User user) {
 		return resumeRepository.findByUserIdAndIsDefaultTrue(user)
-				.orElseThrow(() -> new RuntimeException("No default resume found"));
+				   .orElseThrow(() -> new JobPortalException("No default resume found"));
 	}
 
 	@Override
 	public void deleteResume(String resumeId, User user) {
 		Resume resume = resumeRepository.findByIdAndUserId(resumeId, user)
-				.orElseThrow(() -> new RuntimeException("Resume not found"));
+				   .orElseThrow(() -> new JobPortalException("Resume not found"));
 		
 		// If deleting default resume, set another as default
 		if (resume.getIsDefault()) {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import com.jobportal.dto.UserDTO;
 import com.jobportal.entity.User;
 import com.jobportal.repository.UserRepository;
+import com.jobportal.exception.JobPortalException;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
@@ -30,7 +31,7 @@ public class UserServiceImpl implements UserService {
 		if (userDTO.getEmail() != null && !userDTO.getEmail().equals(user.getEmail())) {
 			// Check if new email is already taken
 			if (userRepository.findByEmail(userDTO.getEmail()).isPresent()) {
-				throw new RuntimeException("Email already exists");
+				   throw new JobPortalException("Email already exists");
 			}
 			user.setEmail(userDTO.getEmail().toLowerCase());
 		}
@@ -44,7 +45,7 @@ public class UserServiceImpl implements UserService {
 	public void changePassword(User user, String oldPassword, String newPassword) {
 		// Verify old password
 		if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
-			throw new RuntimeException("Current password is incorrect");
+			   throw new JobPortalException("Current password is incorrect");
 		}
 		
 		// Set new password
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserDTO getUserById(String userId) {
 		User user = userRepository.findById(userId)
-				.orElseThrow(() -> new RuntimeException("User not found"));
+				   .orElseThrow(() -> new JobPortalException("User not found"));
 		return user.toDTO();
 	}
 }

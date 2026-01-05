@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,11 +57,11 @@ public class JobServiceImpl implements JobService {
 	@Override
 	public JobDTO updateJob(String jobId, JobDTO jobDTO, User recruiter) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		// Check if recruiter owns this job
 		if (!job.getPostedBy().getId().equals(recruiter.getId())) {
-			throw new RuntimeException("You don't have permission to update this job");
+			   throw new JobPortalException("You don't have permission to update this job");
 		}
 		
 		job.setTitle(jobDTO.getTitle());
@@ -89,11 +91,11 @@ public class JobServiceImpl implements JobService {
 	@Override
 	public void deleteJob(String jobId, User recruiter) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		// Check if recruiter owns this job
 		if (!job.getPostedBy().getId().equals(recruiter.getId())) {
-			throw new RuntimeException("You don't have permission to delete this job");
+			   throw new JobPortalException("You don't have permission to delete this job");
 		}
 		
 		jobRepository.delete(job);
@@ -102,7 +104,7 @@ public class JobServiceImpl implements JobService {
 	@Override
 	public JobDTO getJobById(String jobId) {
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		// Increment views
 		job.setViews(job.getViews() + 1);

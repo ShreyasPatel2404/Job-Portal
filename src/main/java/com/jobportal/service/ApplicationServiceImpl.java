@@ -1,4 +1,6 @@
+
 package com.jobportal.service;
+import com.jobportal.exception.JobPortalException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,16 +31,16 @@ public class ApplicationServiceImpl implements ApplicationService {
 	public ApplicationDTO applyToJob(String jobId, ApplicationDTO applicationDTO, User applicant) {
 		// Check if job exists
 		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
+				   .orElseThrow(() -> new JobPortalException("Job not found"));
 		
 		// Check if job is active
 		if (!"active".equals(job.getStatus())) {
-			throw new RuntimeException("Cannot apply to inactive job");
+			   throw new JobPortalException("Cannot apply to inactive job");
 		}
 		
 		// Check if already applied
 		if (applicationRepository.findByJobIdAndApplicantId(job, applicant).isPresent()) {
-			throw new RuntimeException("You have already applied to this job");
+			   throw new JobPortalException("You have already applied to this job");
 		}
 		
 		// Create application
@@ -66,7 +68,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Override
 	public ApplicationDTO getApplicationById(String applicationId) {
 		Application application = applicationRepository.findById(applicationId)
-				.orElseThrow(() -> new RuntimeException("Application not found"));
+				   .orElseThrow(() -> new JobPortalException("Application not found"));
 		return convertToDTO(application);
 	}
 
@@ -85,11 +87,11 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Override
 	public ApplicationDTO updateApplicationStatus(String applicationId, String status, User recruiter, String notes, String rejectionReason) {
 		Application application = applicationRepository.findById(applicationId)
-				.orElseThrow(() -> new RuntimeException("Application not found"));
+				   .orElseThrow(() -> new JobPortalException("Application not found"));
 		
 		// Check if recruiter owns the job
 		if (!application.getJobId().getPostedBy().getId().equals(recruiter.getId())) {
-			throw new RuntimeException("You don't have permission to update this application");
+			   throw new JobPortalException("You don't have permission to update this application");
 		}
 		
 		application.setStatus(status);
@@ -116,7 +118,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 	@Override
 	public void withdrawApplication(String applicationId, User applicant) {
 		Application application = applicationRepository.findById(applicationId)
-				.orElseThrow(() -> new RuntimeException("Application not found"));
+				   .orElseThrow(() -> new JobPortalException("Application not found"));
 		
 		// Check if applicant owns the application
 		if (!application.getApplicantId().getId().equals(applicant.getId())) {

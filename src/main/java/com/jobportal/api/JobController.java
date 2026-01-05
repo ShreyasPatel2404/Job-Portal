@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,20 +40,23 @@ public class JobController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@PostMapping
 	public ResponseEntity<JobDTO> createJob(@Valid @RequestBody JobDTO jobDTO, Authentication authentication) {
 		User recruiter = getCurrentUser(authentication);
 		JobDTO createdJob = jobService.createJob(jobDTO, recruiter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(createdJob);
 	}
-	
+
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@PutMapping("/{id}")
 	public ResponseEntity<JobDTO> updateJob(@PathVariable String id, @Valid @RequestBody JobDTO jobDTO, Authentication authentication) {
 		User recruiter = getCurrentUser(authentication);
 		JobDTO updatedJob = jobService.updateJob(id, jobDTO, recruiter);
 		return ResponseEntity.ok(updatedJob);
 	}
-	
+
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> deleteJob(@PathVariable String id, Authentication authentication) {
 		User recruiter = getCurrentUser(authentication);

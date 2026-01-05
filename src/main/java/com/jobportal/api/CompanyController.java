@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,7 @@ public class CompanyController {
 	@Autowired
 	private UserRepository userRepository;
 	
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@PostMapping("/profile")
 	public ResponseEntity<Company> createCompanyProfile(
 			@Valid @RequestBody Company company,
@@ -39,7 +42,8 @@ public class CompanyController {
 		Company created = companyService.createCompanyProfile(company, recruiter);
 		return ResponseEntity.status(HttpStatus.CREATED).body(created);
 	}
-	
+
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@PutMapping("/profile")
 	public ResponseEntity<Company> updateCompanyProfile(
 			@Valid @RequestBody Company company,
@@ -48,7 +52,8 @@ public class CompanyController {
 		Company updated = companyService.updateCompanyProfile(company, recruiter);
 		return ResponseEntity.ok(updated);
 	}
-	
+
+	@PreAuthorize("hasRole('EMPLOYER')")
 	@GetMapping("/profile")
 	public ResponseEntity<Company> getCompanyProfile(Authentication authentication) {
 		User recruiter = getCurrentUser(authentication);
