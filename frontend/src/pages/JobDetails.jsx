@@ -4,6 +4,9 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { jobService } from '../services/jobService';
 import { applicationService } from '../services/applicationService';
 import { useAuth } from '../context/AuthContext';
+import { Sparkles, ListChecks } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
+import { Progress } from '../components/ui/progress';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -78,35 +81,105 @@ const JobDetails = () => {
     );
   }
 
+  const matchScore = job.matchScore || job.aiMatchScore;
+  const skills = job.skills || job.requiredSkills || [];
+
   return (
     <div className="container mx-auto px-4 py-10">
-      <div className="max-w-3xl mx-auto bg-white dark:bg-zinc-900 shadow-xl rounded-2xl p-8 md:p-12 relative">
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 dark:bg-primary-900 shadow-lg border-4 border-white dark:border-zinc-900">
-          <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0V5a4 4 0 00-8 0v2m8 0a4 4 0 01-8 0m8 0v2a4 4 0 01-8 0V7m8 0a4 4 0 00-8 0" /></svg>
+      <div className="relative mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 md:p-10">
+        <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-primary-100 shadow-lg dark:border-zinc-900 dark:bg-primary-900">
+          <svg className="h-8 w-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0V5a4 4 0 00-8 0v2m8 0a4 4 0 01-8 0m8 0v2a4 4 0 01-8 0V7m8 0a4 4 0 00-8 0" /></svg>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-center mb-2 mt-10 text-zinc-900 dark:text-white">{job.title}</h1>
-        <p className="text-lg text-center text-primary-600 dark:text-primary-400 font-semibold mb-1">{job.company}</p>
-        <p className="text-center text-gray-500 dark:text-gray-400 mb-6">{job.location} • {job.jobType}</p>
+        <h1 className="mt-10 text-center text-2xl font-semibold text-zinc-900 dark:text-white md:text-3xl">
+          {job.title}
+        </h1>
+        <p className="mt-1 text-center text-sm font-medium text-primary-600 dark:text-primary-400">
+          {job.company}
+        </p>
+        <p className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
+          {job.location} • {job.jobType}
+        </p>
 
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-2 text-zinc-800 dark:text-zinc-200">Description</h2>
-          <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">{job.description}</p>
-        </div>
-
-        {job.requirements && job.requirements.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold mb-2 text-zinc-800 dark:text-zinc-200">Requirements</h2>
-            <ul className="list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-              {job.requirements.map((req, index) => (
-                <li key={index}>{req}</li>
-              ))}
-            </ul>
+        {/* AI match insights */}
+        {(matchScore != null || skills.length > 0) && (
+          <div className="mt-6 rounded-xl border border-dashed border-primary-200 bg-primary-50/70 p-4 text-xs dark:border-primary-800 dark:bg-primary-950/40">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white">
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold text-primary-900 dark:text-primary-100">
+                    AI match insights
+                  </p>
+                  <p className="text-[11px] text-primary-900/80 dark:text-primary-100/80">
+                    Based on your profile and this role’s requirements.
+                  </p>
+                </div>
+              </div>
+              {matchScore != null && (
+                <Badge
+                  variant={matchScore >= 85 ? 'success' : 'secondary'}
+                  className="shrink-0 text-[10px]"
+                >
+                  Match {matchScore}%
+                </Badge>
+              )}
+            </div>
+            {matchScore != null && (
+              <div className="mt-3">
+                <Progress value={matchScore} />
+              </div>
+            )}
+            {skills.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {skills.slice(0, 6).map((skill) => (
+                  <Badge key={skill} variant="outline" className="text-[10px]">
+                    {skill}
+                  </Badge>
+                ))}
+                {skills.length > 6 && (
+                  <span className="text-[10px] text-primary-700 dark:text-primary-300">
+                    +{skills.length - 6} more
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
-        {isAuthenticated && user?.accountType === 'APPLICANT' && (
-          <div className="mt-10 border-t border-gray-200 dark:border-zinc-700 pt-8">
-            <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Apply for this Job</h2>
+        <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,2fr),minmax(0,1.4fr)]">
+          <div>
+            <div className="mb-6">
+              <h2 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                Description
+              </h2>
+              <p className="whitespace-pre-line text-xs leading-relaxed text-gray-700 dark:text-gray-300">
+                {job.description}
+              </p>
+            </div>
+
+            {job.requirements && job.requirements.length > 0 && (
+              <div className="mb-4">
+                <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                  <ListChecks className="h-3.5 w-3.5 text-primary-500" aria-hidden="true" />
+                  Requirements
+                </h2>
+                <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
+                  {job.requirements.map((req, index) => (
+                    <li key={index} className="flex gap-1.5">
+                      <span className="mt-1 h-1 w-1 rounded-full bg-gray-400" />
+                      <span>{req}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+
+          {isAuthenticated && user?.accountType === 'APPLICANT' && (
+          <div className="mt-10 border-t border-gray-200 pt-8 dark:border-zinc-700">
+            <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-white">Apply for this job</h2>
             {successMsg && (
               <div className="mb-4 px-4 py-2 rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 shadow">
                 {successMsg}
@@ -117,9 +190,12 @@ const JobDetails = () => {
                 {errorMsg}
               </div>
             )}
-            <form onSubmit={handleApply} className="space-y-5">
+            <form onSubmit={handleApply} className="space-y-4 text-xs">
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2" htmlFor="resumeUrl">
+                <label
+                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
+                  htmlFor="resumeUrl"
+                >
                   Resume URL <span className="text-red-500">*</span>
                 </label>
                 <input
@@ -128,20 +204,23 @@ const JobDetails = () => {
                   required
                   value={applicationData.resumeUrl}
                   onChange={(e) => setApplicationData({ ...applicationData, resumeUrl: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary-400"
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   placeholder="https://your-resume-link.com"
                   autoComplete="off"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-200 mb-2" htmlFor="coverLetter">
-                  Cover Letter <span className="text-xs text-gray-400">(Optional)</span>
+                <label
+                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
+                  htmlFor="coverLetter"
+                >
+                  Cover letter <span className="text-[10px] text-gray-400">(optional)</span>
                 </label>
                 <textarea
                   id="coverLetter"
                   value={applicationData.coverLetter}
                   onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white focus:ring-2 focus:ring-primary-400"
+                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                   rows="4"
                   placeholder="Write your cover letter..."
                 />
@@ -149,12 +228,12 @@ const JobDetails = () => {
               <button
                 type="submit"
                 disabled={applying}
-                className="w-full bg-primary-600 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg bg-primary-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition disabled:cursor-not-allowed disabled:opacity-50"
                 aria-busy={applying}
               >
                 {applying ? (
                   <span className="flex items-center justify-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>Submitting...</span>
-                ) : 'Submit Application'}
+                ) : 'Submit application'}
               </button>
             </form>
           </div>
