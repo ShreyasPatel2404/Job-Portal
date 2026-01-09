@@ -2,6 +2,7 @@ package com.jobportal.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.CreatedDate;
@@ -41,11 +42,11 @@ public class User {
 	private String bio; // Max 500 characters
 	
 	// For Job Seekers
-	private List<String> skills;
-	
-	private List<Experience> experience;
-	
-	private List<Education> education;
+	private List<String> skills = new ArrayList<>();
+    
+	private List<Experience> experience = new ArrayList<>();
+    
+	private List<Education> education = new ArrayList<>();
 	
 	private Boolean isActive = true;
 	

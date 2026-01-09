@@ -26,8 +26,8 @@ const ResetPassword = () => {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
+        <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center border border-slate-200 dark:border-zinc-700">
           <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Reset Password</h2>
           <p className="text-red-600 dark:text-red-400">Invalid or missing reset token.</p>
         </div>
@@ -36,8 +36,8 @@ const ResetPassword = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-zinc-900">
-      <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
+      <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center border border-slate-200 dark:border-zinc-700">
         <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Reset Password</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <input

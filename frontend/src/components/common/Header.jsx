@@ -2,6 +2,19 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
+const navLinks = [
+  { to: '/jobs', label: 'Jobs', roles: ['ADMIN', 'EMPLOYER', 'APPLICANT', null] },
+  { to: '/dashboard/admin', label: 'Admin Dashboard', roles: ['ADMIN'] },
+  { to: '/dashboard/recruiter', label: 'Employer Dashboard', roles: ['EMPLOYER'] },
+  { to: '/jobs/post', label: 'Post Job', roles: ['EMPLOYER'] },
+  { to: '/dashboard/jobseeker', label: 'Job Seeker Dashboard', roles: ['APPLICANT'] },
+  { to: '/applications', label: 'Applications', roles: ['APPLICANT'] },
+  { to: '/saved-jobs', label: 'Saved Jobs', roles: ['ADMIN', 'EMPLOYER', 'APPLICANT'] },
+  { to: '/companies/1/reviews', label: 'Company Reviews', roles: ['ADMIN', 'EMPLOYER', 'APPLICANT'] },
+  { to: '/notifications', label: 'Notifications', roles: ['ADMIN', 'EMPLOYER', 'APPLICANT'] },
+  { to: '/profile', label: 'Profile', roles: ['ADMIN', 'EMPLOYER', 'APPLICANT'] },
+];
+
 const Header = () => {
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -12,78 +25,59 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white shadow-md">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-primary-600">
-            JobPortal
-          </Link>
-
-          <nav className="flex items-center space-x-6">
-            <Link to="/jobs" className="text-gray-700 hover:text-primary-600">
-              Jobs
-            </Link>
-
-            {isAuthenticated ? (
-              <>
-                {user?.accountType === 'ADMIN' && (
-                  <Link to="/dashboard/admin" className="text-gray-700 hover:text-primary-600">
-                    Admin Dashboard
-                  </Link>
-                )}
-                {user?.accountType === 'EMPLOYER' && (
-                  <>
-                    <Link to="/dashboard/recruiter" className="text-gray-700 hover:text-primary-600">
-                      Employer Dashboard
+    <header className="bg-white shadow-md sticky top-0 z-30" role="banner">
+      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+        <Link
+          to="/"
+          className="text-2xl font-bold text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
+          aria-label="Job Portal Home"
+        >
+          JobPortal
+        </Link>
+        <nav aria-label="Main navigation" className="hidden md:flex items-center gap-2 lg:gap-6">
+          {navLinks.map(
+            ({ to, label, roles }) =>
+              isAuthenticated && roles.includes(user?.accountType)
+                ? (
+                    <Link
+                      key={to}
+                      to={to}
+                      className="px-2 py-1 rounded text-gray-700 hover:text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
+                    >
+                      {label}
                     </Link>
-                    <Link to="/jobs/post" className="text-gray-700 hover:text-primary-600">
-                      Post Job
-                    </Link>
-                  </>
-                )}
-                {user?.accountType === 'APPLICANT' && (
-                  <>
-                    <Link to="/dashboard/jobseeker" className="text-gray-700 hover:text-primary-600">
-                      Job Seeker Dashboard
-                    </Link>
-                    <Link to="/applications" className="text-gray-700 hover:text-primary-600">
-                      Applications
-                    </Link>
-                  </>
-                )}
-                <Link to="/saved-jobs" className="text-gray-700 hover:text-primary-600">
-                  Saved Jobs
-                </Link>
-                <Link to="/companies/1/reviews" className="text-gray-700 hover:text-primary-600">
-                  Company Reviews
-                </Link>
-                <Link to="/notifications" className="text-gray-700 hover:text-primary-600">
-                  Notifications
-                </Link>
-                <Link to="/profile" className="text-gray-700 hover:text-primary-600">
-                  Profile
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="text-gray-700 hover:text-primary-600">
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700"
-                >
-                  Register
-                </Link>
-              </>
-            )}
-          </nav>
+                  )
+                : null
+          )}
+          {!isAuthenticated && (
+            <>
+              <Link
+                to="/login"
+                className="px-2 py-1 rounded text-gray-700 hover:text-primary-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="ml-2 px-4 py-2 rounded bg-primary-600 text-white hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
+              >
+                Register
+              </Link>
+            </>
+          )}
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="ml-2 px-4 py-2 rounded bg-primary-600 text-white hover:bg-primary-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 transition-colors"
+              aria-label="Logout"
+            >
+              Logout
+            </button>
+          )}
+        </nav>
+        {/* Mobile menu button (future: add mobile nav) */}
+        <div className="md:hidden">
+          {/* TODO: Add mobile menu button and drawer */}
         </div>
       </div>
     </header>

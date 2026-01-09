@@ -60,95 +60,161 @@ const Applications = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="mb-6 text-2xl font-bold text-gray-900 dark:text-white">My applications</h1>
+    <div className="container mx-auto px-4 py-8 max-w-7xl bg-slate-50 dark:bg-zinc-950 min-h-screen">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">My Applications</h1>
+        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
+          Track and manage your job applications
+        </p>
+      </div>
       {loading ? (
-        <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-300 animate-pulse">
-          Loading applications...
+        <div className="py-12 text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Loading applications...</p>
         </div>
       ) : applications.length > 0 ? (
-        <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white text-xs shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <table className="min-w-full">
-            <thead className="bg-gray-50 text-[11px] text-gray-500 dark:bg-zinc-900 dark:text-gray-400">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium">Job</th>
-                <th className="px-4 py-2 text-left font-medium">Company</th>
-                <th className="px-4 py-2 text-left font-medium">Status</th>
-                <th className="px-4 py-2 text-left font-medium">Applied</th>
-                <th className="px-4 py-2 text-left font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {applications.map((app) => (
-                <tr key={app.id} className="border-t text-xs text-gray-800 dark:border-zinc-800 dark:text-gray-100">
-                  <td className="px-4 py-2">{app.jobTitle}</td>
-                  <td className="px-4 py-2">{app.company}</td>
-                  <td className="px-4 py-2">
-                    <Badge
-                      variant={
-                        app.status === 'ACCEPTED'
-                          ? 'success'
-                          : app.status === 'REJECTED'
-                          ? 'destructive'
-                          : 'secondary'
-                      }
-                      className="text-[10px]"
-                    >
-                      {app.status}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2">
-                    {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : '-'}
-                  </td>
-                  <td className="px-4 py-2">
-                    <a
-                      href={app.resumeUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mr-3 text-[11px] font-medium text-primary-600 hover:underline dark:text-primary-300"
-                    >
-                      Resume
-                    </a>
-                    {app.status === 'PENDING' && (
-                      <button
-                        onClick={() => handleWithdrawClick(app.id, app.jobTitle)}
-                        className="text-[11px] font-medium text-red-600 hover:underline"
-                      >
-                        Withdraw
-                      </button>
-                    )}
-                  </td>
+        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-zinc-800" role="table">
+              <thead className="bg-slate-50 dark:bg-zinc-900/50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                    Job
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                    Company
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                    Applied
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200 dark:bg-zinc-900 dark:divide-zinc-800">
+                {applications.map((app) => (
+                  <tr 
+                    key={app.id} 
+                    className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
+                        {app.jobTitle}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {app.company}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Badge
+                        variant={
+                          app.status === 'ACCEPTED'
+                            ? 'success'
+                            : app.status === 'REJECTED'
+                            ? 'destructive'
+                            : 'secondary'
+                        }
+                        className="text-xs"
+                      >
+                        {app.status}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-700 dark:text-gray-300">
+                        {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        }) : '-'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <div className="flex items-center gap-3">
+                        {app.resumeUrl && (
+                          <a
+                            href={app.resumeUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
+                            aria-label={`View resume for ${app.jobTitle}`}
+                          >
+                            View Resume
+                          </a>
+                        )}
+                        {app.status === 'PENDING' && (
+                          <button
+                            onClick={() => handleWithdrawClick(app.id, app.jobTitle)}
+                            className="font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
+                            aria-label={`Withdraw application for ${app.jobTitle}`}
+                          >
+                            Withdraw
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center space-x-2 border-t border-gray-200 bg-gray-50 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-900">
-              <button
-                onClick={() => setPage(page - 1)}
-                disabled={page === 0}
-                className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-700 hover:bg-primary-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
-              >
-                Previous
-              </button>
-              <span className="px-2 py-1 text-gray-700 dark:text-gray-200">
-                Page {page + 1} of {totalPages}
-              </span>
-              <button
-                onClick={() => setPage(page + 1)}
-                disabled={page >= totalPages - 1}
-                className="rounded border border-gray-300 bg-white px-3 py-1 text-gray-700 hover:bg-primary-50 disabled:opacity-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
-              >
-                Next
-              </button>
+            <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <div className="text-sm text-gray-700 dark:text-gray-300">
+                Page <span className="font-semibold">{page + 1}</span> of{' '}
+                <span className="font-semibold">{totalPages}</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setPage(page - 1)}
+                  disabled={page === 0}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
+                  aria-label="Previous page"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => setPage(page + 1)}
+                  disabled={page >= totalPages - 1}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
+                  aria-label="Next page"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
       ) : (
-        <div className="py-8 text-center text-sm text-gray-500 dark:text-gray-400">
-          No applications found yet. When you apply to roles, they’ll appear here with live status
-          updates.
+        <div className="rounded-xl border border-slate-200 bg-slate-50 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
+          <div className="mx-auto max-w-md px-4">
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+              />
+            </svg>
+            <h3 className="mt-4 text-sm font-semibold text-gray-900 dark:text-gray-50">
+              No applications yet
+            </h3>
+            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+              When you apply to roles, they'll appear here with live status updates.
+            </p>
+          </div>
         </div>
       )}
 

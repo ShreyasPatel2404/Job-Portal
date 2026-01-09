@@ -76,7 +76,7 @@ const EmployerDashboard = () => {
             {pipelines.map((stage) => (
               <div
                 key={stage.stage}
-                className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm dark:bg-zinc-900/60"
+                className="flex items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-sm dark:bg-zinc-900/60"
               >
                 <div className="flex items-center gap-2">
                   <span className="font-medium text-gray-800 dark:text-gray-100">
@@ -105,21 +105,21 @@ const EmployerDashboard = () => {
           <CardContent className="space-y-3 text-sm">
             <Link
               to="/jobs/post"
-              className="flex items-center justify-between rounded-md border border-dashed border-gray-300 px-3 py-2 text-primary-700 hover:border-primary-400 hover:bg-primary-50/40 dark:border-zinc-700 dark:text-primary-300 dark:hover:border-primary-600 dark:hover:bg-primary-900/10"
+              className="flex items-center justify-between rounded-md border border-dashed border-slate-300 px-3 py-2 text-primary-700 hover:border-primary-400 hover:bg-primary-50/40 dark:border-zinc-700 dark:text-primary-300 dark:hover:border-primary-600 dark:hover:bg-primary-900/10"
             >
               <span>Post a new role</span>
               <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
             <Link
               to="/dashboard/recruiter/applications"
-              className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-zinc-900"
+              className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-gray-700 hover:bg-slate-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-zinc-900"
             >
               <span>Review new applicants</span>
               <Users className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
             <Link
               to="/dashboard/recruiter/interviews"
-              className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-zinc-900"
+              className="flex items-center justify-between rounded-md border border-slate-200 px-3 py-2 text-gray-700 hover:bg-slate-50 dark:border-zinc-700 dark:text-gray-200 dark:hover:bg-zinc-900"
             >
               <span>Schedule interviews</span>
               <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />

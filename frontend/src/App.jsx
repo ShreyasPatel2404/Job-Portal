@@ -37,7 +37,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="min-h-screen bg-gray-50 dark:bg-zinc-950">
+        <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
           <TopNav onOpenMobileNav={() => setMobileNavOpen(!mobileNavOpen)} />
           <Routes>
             <Route path="/" element={<Home />} />

@@ -227,6 +227,7 @@ const JobDetails = () => {
               </div>
               <button
                 type="submit"
+
                 disabled={applying}
                 className="w-full rounded-lg bg-primary-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition disabled:cursor-not-allowed disabled:opacity-50"
                 aria-busy={applying}
@@ -240,6 +241,7 @@ const JobDetails = () => {
         )}
       </div>
     </div>
+  </div>
   );
 };
 

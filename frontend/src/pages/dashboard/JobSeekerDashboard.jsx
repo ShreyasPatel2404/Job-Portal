@@ -93,7 +93,7 @@ const JobSeekerDashboard = () => {
               {applicationStats.map((item) => (
                 <div
                   key={item.label}
-                  className="rounded-lg bg-gray-50 px-3 py-2 text-center text-xs dark:bg-zinc-900/60"
+                  className="rounded-lg bg-slate-50 px-3 py-2 text-center text-xs dark:bg-zinc-900/60"
                 >
                   <p className="text-2xl font-semibold text-gray-900 dark:text-gray-50">
                     {item.value}

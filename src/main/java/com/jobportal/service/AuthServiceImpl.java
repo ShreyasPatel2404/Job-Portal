@@ -76,18 +76,15 @@ public class AuthServiceImpl implements AuthService {
 		String text = "Welcome to Job Portal! Please verify your email by clicking the link: " + verifyLink;
 		emailUtil.sendEmail(user.getEmail(), subject, text);
 
-		// Generate JWT token
-		UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());
-		String token = jwtUtil.generateToken(userDetails, user.getId(), user.getAccountType());
-
-		// Create UserDTO
+		// Do not generate JWT token for unverified user
+		// Return a response indicating verification is required
 		UserDTO userDTO = new UserDTO();
 		userDTO.setId(user.getId());
 		userDTO.setName(user.getName());
 		userDTO.setEmail(user.getEmail());
 		userDTO.setAccountType(user.getAccountType());
 
-		return new AuthResponse(token, "Bearer", userDTO);
+		return new AuthResponse(null, "Bearer", userDTO); // token is null
 	}
 	@Override
 	public void sendVerificationEmail(String email) {
@@ -148,29 +145,29 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public AuthResponse login(LoginRequest request) {
-		// Authenticate user
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						request.getEmail(),
-						request.getPassword()
-				)
-		);
-		
+		try {
+			// Authenticate user
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(
+							request.getEmail(),
+							request.getPassword()
+					)
+			);
+		} catch (Exception ex) {
+			throw new JobPortalException("Invalid email or password");
+		}
 		// Load user details
 		UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
 		User user = userRepository.findByEmail(request.getEmail())
 				   .orElseThrow(() -> new JobPortalException("User not found"));
-		
 		// Generate JWT token
 		String token = jwtUtil.generateToken(userDetails, user.getId(), user.getAccountType());
-		
 		// Create UserDTO
 		UserDTO userDTO = new UserDTO();
 		userDTO.setId(user.getId());
 		userDTO.setName(user.getName());
 		userDTO.setEmail(user.getEmail());
 		userDTO.setAccountType(user.getAccountType());
-		
 		return new AuthResponse(token, "Bearer", userDTO);
 	}
 }

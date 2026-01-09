@@ -119,9 +119,9 @@ const EmployerApplications = () => {
               No applications for this job.
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white text-xs shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
+            <div className="overflow-x-auto rounded-lg border border-slate-200 bg-white text-xs shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
               <table className="min-w-full">
-                <thead className="bg-gray-50 text-[11px] text-gray-500 dark:bg-zinc-900 dark:text-gray-400">
+                <thead className="bg-slate-50 text-[11px] text-gray-500 dark:bg-zinc-900 dark:text-gray-400">
                   <tr>
                     <th className="px-4 py-2 text-left font-medium">Applicant</th>
                     <th className="px-4 py-2 text-left font-medium">Resume</th>
@@ -192,7 +192,7 @@ const EmployerApplications = () => {
               </table>
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex justify-center space-x-2 border-t border-gray-200 bg-gray-50 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-900">
+                <div className="flex justify-center space-x-2 border-t border-slate-200 bg-slate-50 py-3 text-[11px] dark:border-zinc-800 dark:bg-zinc-900">
                   <button
                     onClick={() => setPage(page - 1)}
                     disabled={page === 0}

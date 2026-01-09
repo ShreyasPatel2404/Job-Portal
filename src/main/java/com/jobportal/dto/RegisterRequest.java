@@ -23,7 +23,7 @@ public class RegisterRequest {
 	@Size(min = 8, message = "Password must be at least 8 characters")
 	private String password;
 	
-	@NotBlank(message = "Account type is required")
+	@jakarta.validation.constraints.NotNull(message = "Account type is required")
 	private AccountType accountType;
 }
 
