@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { DashboardLayout } from '../../components/layout/DashboardLayout';
 import { resumeService } from '../../services/resumeService';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FileText, Upload, Trash2, Check, Globe, File, Star, Plus } from 'lucide-react';
 
 const ResumeManager = () => {
   const [resumes, setResumes] = useState([]);
@@ -11,6 +14,7 @@ const ResumeManager = () => {
     description: '',
   });
   const [error, setError] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     fetchResumes();
@@ -41,6 +45,7 @@ const ResumeManager = () => {
       await resumeService.uploadResume(resumeData);
       setResumeData({ url: '', title: '', description: '' });
       fetchResumes();
+      setShowForm(false);
     } catch (err) {
       setError('Failed to upload resume');
     } finally {
@@ -51,7 +56,7 @@ const ResumeManager = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Delete this resume?')) {
       await resumeService.deleteResume(id);
-      fetchResumes();
+      setResumes(resumes.filter(r => r.id !== id));
     }
   };
 
@@ -61,49 +66,134 @@ const ResumeManager = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Manage Resumes</h1>
-      <form onSubmit={handleUpload} className="bg-white dark:bg-zinc-800 p-6 rounded-lg shadow space-y-4 mb-8">
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="url">Resume URL</label>
-          <input id="url" name="url" value={resumeData.url} onChange={handleChange} required className="w-full px-3 py-2 border rounded" placeholder="https://..." />
+    <DashboardLayout
+      role="APPLICANT"
+      title="Resume Manager"
+      description="Manage your CVs and documents."
+    >
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <FileText className="w-6 h-6 text-primary" />
+            My Resumes
+          </h2>
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-sm"
+          >
+            {showForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Resume</>}
+          </button>
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="title">Title</label>
-          <input id="title" name="title" value={resumeData.title} onChange={handleChange} required className="w-full px-3 py-2 border rounded" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-1" htmlFor="description">Description</label>
-          <input id="description" name="description" value={resumeData.description} onChange={handleChange} className="w-full px-3 py-2 border rounded" />
-        </div>
-        {error && <div className="text-red-600 text-sm">{error}</div>}
-        <button type="submit" className="w-full bg-primary-600 text-white py-2 rounded hover:bg-primary-700 transition" disabled={uploading}>
-          {uploading ? 'Uploading...' : 'Upload Resume'}
-        </button>
-      </form>
-      {loading ? (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-300 animate-pulse">Loading resumes...</div>
-      ) : resumes.length > 0 ? (
-        <div className="space-y-4">
-          {resumes.map(resume => (
-            <div key={resume.id} className={`p-4 rounded shadow flex items-center justify-between ${resume.isDefault ? 'bg-primary-50 dark:bg-primary-900/20' : 'bg-white dark:bg-zinc-800'}`}>
-              <div>
-                <div className="font-semibold">{resume.title}</div>
-                <div className="text-sm text-gray-500 dark:text-gray-300">{resume.description}</div>
-                <a href={resume.url} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline text-sm">View Resume</a>
-                {resume.isDefault && <span className="ml-2 px-2 py-1 bg-primary-600 text-white text-xs rounded">Default</span>}
+
+        <AnimatePresence>
+          {showForm && (
+            <motion.form
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="glass-card rounded-2xl p-6 border border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 overflow-hidden"
+              onSubmit={handleUpload}
+            >
+              <h3 className="text-lg font-semibold mb-4">Add New Resume</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1.5" htmlFor="url">Resume URL (PDF/Doc)</label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input id="url" name="url" value={resumeData.url} onChange={handleChange} required className="w-full pl-10 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="https://..." />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" htmlFor="title">Title</label>
+                    <input id="title" name="title" value={resumeData.title} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="e.g. Frontend Dev Resume" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-1.5" htmlFor="description">Description</label>
+                    <input id="description" name="description" value={resumeData.description} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Optional notes" />
+                  </div>
+                </div>
+                {error && <div className="text-red-500 text-sm font-medium bg-red-50 dark:bg-red-900/10 p-2 rounded-lg">{error}</div>}
+                <div className="flex justify-end pt-2">
+                  <button type="submit" disabled={uploading} className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all disabled:opacity-50">
+                    {uploading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Upload className="w-4 h-4" />}
+                    Upload Resume
+                  </button>
+                </div>
               </div>
-              <div className="space-x-2">
-                {!resume.isDefault && <button onClick={() => handleSetDefault(resume.id)} className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">Set Default</button>}
-                <button onClick={() => handleDelete(resume.id)} className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
-              </div>
+            </motion.form>
+          )}
+        </AnimatePresence>
+
+        {loading ? (
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="h-20 rounded-xl bg-gray-100 dark:bg-zinc-900 animate-pulse" />
+            ))}
+          </div>
+        ) : resumes.length > 0 ? (
+          <div className="space-y-3">
+            <AnimatePresence>
+              {resumes.map(resume => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  key={resume.id}
+                  className={`group flex items-center justify-between p-4 rounded-xl border transition-all duration-200 ${resume.isDefault ? 'bg-primary/5 border-primary/20 dark:bg-primary/10' : 'bg-white dark:bg-zinc-900/50 border-slate-200 dark:border-zinc-800 hover:border-primary/30'}`}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`p-3 rounded-xl ${resume.isDefault ? 'bg-primary text-white' : 'bg-gray-100 dark:bg-zinc-800 text-gray-500'}`}>
+                      <File className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                        {resume.title}
+                        {resume.isDefault && <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] uppercase tracking-wider font-bold">Default</span>}
+                      </h4>
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                        <span>{resume.description || 'No description'}</span>
+                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-zinc-700" />
+                        <a href={resume.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">View File</a>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {!resume.isDefault && (
+                      <button
+                        onClick={() => handleSetDefault(resume.id)}
+                        className="p-2 rounded-lg text-gray-500 hover:text-primary hover:bg-primary/10 transition-colors"
+                        title="Set as Default"
+                      >
+                        <Star className="w-5 h-5" />
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDelete(resume.id)}
+                      className="p-2 rounded-lg text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        ) : (
+          <div className="text-center py-12 border-2 border-dashed border-slate-200 dark:border-zinc-800 rounded-2xl bg-slate-50/50 dark:bg-zinc-900/50">
+            <div className="mx-auto w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-4">
+              <FileText className="w-8 h-8 text-gray-400" />
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">No resumes uploaded</div>
-      )}
-    </div>
+            <h3 className="text-lg font-semibold mb-1">No resumes found</h3>
+            <p className="text-muted-foreground mb-4">Upload a resume to start applying for jobs.</p>
+            <button onClick={() => setShowForm(true)} className="text-primary font-semibold hover:underline">Upload your first resume</button>
+          </div>
+        )}
+      </div>
+    </DashboardLayout>
   );
 };
 

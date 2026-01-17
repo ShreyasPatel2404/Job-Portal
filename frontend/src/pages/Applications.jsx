@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { applicationService } from '../services/applicationService';
 import { Badge } from '../components/ui/badge';
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { useToast } from '../components/common/ToastContainer.jsx';
+import { motion } from 'framer-motion';
+import { FileText, Building2, Calendar, Ban } from 'lucide-react';
 
 const Applications = () => {
   const [applications, setApplications] = useState([]);
@@ -60,191 +63,191 @@ const Applications = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl bg-slate-50 dark:bg-zinc-950 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">My Applications</h1>
-        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
-          Track and manage your job applications
-        </p>
-      </div>
-      {loading ? (
-        <div className="py-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading applications...</p>
+    <DashboardLayout
+      role="APPLICANT"
+      title="My Applications"
+      description="Track and manage your job applications."
+    >
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+            <FileText className="w-6 h-6 text-primary" />
+            Track Applications
+          </h2>
         </div>
-      ) : applications.length > 0 ? (
-        <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-zinc-800" role="table">
-              <thead className="bg-slate-50 dark:bg-zinc-900/50">
-                <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                    Job
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                    Company
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                    Status
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                    Applied
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider dark:text-gray-300">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200 dark:bg-zinc-900 dark:divide-zinc-800">
-                {applications.map((app) => (
-                  <tr 
-                    key={app.id} 
-                    className="hover:bg-gray-50 dark:hover:bg-zinc-800/50 transition-colors"
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900 dark:text-gray-50">
-                        {app.jobTitle}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {app.company}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge
-                        variant={
-                          app.status === 'ACCEPTED'
-                            ? 'success'
-                            : app.status === 'REJECTED'
-                            ? 'destructive'
-                            : 'secondary'
-                        }
-                        className="text-xs"
-                      >
-                        {app.status}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-700 dark:text-gray-300">
-                        {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric'
-                        }) : '-'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <div className="flex items-center gap-3">
-                        {app.resumeUrl && (
-                          <a
-                            href={app.resumeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
-                            aria-label={`View resume for ${app.jobTitle}`}
-                          >
-                            View Resume
-                          </a>
-                        )}
-                        {app.status === 'PENDING' && (
-                          <button
-                            onClick={() => handleWithdrawClick(app.id, app.jobTitle)}
-                            className="font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors"
-                            aria-label={`Withdraw application for ${app.jobTitle}`}
-                          >
-                            Withdraw
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900/50">
-              <div className="text-sm text-gray-700 dark:text-gray-300">
-                Page <span className="font-semibold">{page + 1}</span> of{' '}
-                <span className="font-semibold">{totalPages}</span>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setPage(page - 1)}
-                  disabled={page === 0}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
-                  aria-label="Previous page"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => setPage(page + 1)}
-                  disabled={page >= totalPages - 1}
-                  className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
-                  aria-label="Next page"
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto max-w-md px-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            <h3 className="mt-4 text-sm font-semibold text-gray-900 dark:text-gray-50">
-              No applications yet
-            </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              When you apply to roles, they'll appear here with live status updates.
-            </p>
-          </div>
-        </div>
-      )}
 
-      <Dialog open={Boolean(withdrawId)} onClose={() => setWithdrawId(null)}>
-        <DialogHeader>
-          <DialogTitle>Withdraw application?</DialogTitle>
-        </DialogHeader>
-        <DialogDescription>
-          {pendingJobTitle
-            ? `You’re about to withdraw from “${pendingJobTitle}”. This can’t be undone, and the employer will no longer see you in their pipeline.`
-            : 'You’re about to withdraw this application. This cannot be undone.'}
-        </DialogDescription>
-        <div className="mt-4 flex justify-end gap-2 text-xs">
-          <button
-            type="button"
-            onClick={() => setWithdrawId(null)}
-            className="rounded-md border border-gray-300 bg-white px-3 py-1 text-gray-700 hover:bg-gray-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-gray-200 dark:hover:bg-zinc-800"
+        {loading ? (
+          <div className="py-20 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4"></div>
+            <p className="text-muted-foreground">Loading applications...</p>
+          </div>
+        ) : applications.length > 0 ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card rounded-2xl border border-white/20 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backend-blur-xl shadow-xl overflow-hidden"
           >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={confirmWithdraw}
-            className="rounded-md bg-red-600 px-3 py-1 font-medium text-white hover:bg-red-700"
-          >
-            Withdraw
-          </button>
-        </div>
-      </Dialog>
-    </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-border" role="table">
+                <thead className="bg-slate-50/50 dark:bg-zinc-900/50">
+                  <tr>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Job
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Company
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Applied
+                    </th>
+                    <th scope="col" className="px-6 py-4 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {applications.map((app) => (
+                    <tr
+                      key={app.id}
+                      className="hover:bg-primary/5 transition-colors group"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">
+                          {app.jobTitle}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-sm text-foreground/80">
+                          <Building2 className="w-4 h-4 text-muted-foreground" />
+                          {app.company}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <Badge
+                          variant={
+                            app.status === 'ACCEPTED' || app.status === 'hired'
+                              ? 'success'
+                              : app.status === 'REJECTED' || app.status === 'rejected'
+                                ? 'destructive'
+                                : 'secondary'
+                          }
+                          className="text-xs capitalize"
+                        >
+                          {app.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Calendar className="w-3.5 h-3.5" />
+                          {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                          }) : '-'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <div className="flex items-center gap-4">
+                          {app.resumeUrl && (
+                            <a
+                              href={app.resumeUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-medium text-primary hover:text-primary/80 transition-colors text-xs border border-primary/20 px-3 py-1.5 rounded-md bg-primary/5 hover:bg-primary/10"
+                              aria-label={`View resume for ${app.jobTitle}`}
+                            >
+                              Resume
+                            </a>
+                          )}
+                          {(app.status === 'PENDING' || app.status === 'pending') && (
+                            <button
+                              onClick={() => handleWithdrawClick(app.id, app.jobTitle)}
+                              className="flex items-center gap-1 font-medium text-destructive hover:text-destructive/80 transition-colors text-xs"
+                              aria-label={`Withdraw application for ${app.jobTitle}`}
+                            >
+                              <Ban className="w-3.5 h-3.5" /> Withdraw
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex items-center justify-between border-t border-border bg-slate-50/50 dark:bg-zinc-900/50 px-6 py-4">
+                <div className="text-sm text-muted-foreground">
+                  Page <span className="font-semibold text-foreground">{page + 1}</span> of{' '}
+                  <span className="font-semibold text-foreground">{totalPages}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setPage(page - 1)}
+                    disabled={page === 0}
+                    className="px-4 py-2 rounded-lg border border-border bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    onClick={() => setPage(page + 1)}
+                    disabled={page >= totalPages - 1}
+                    className="px-4 py-2 rounded-lg border border-border bg-white dark:bg-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        ) : (
+          <div className="glass-card rounded-2xl border-dashed border-2 border-slate-200 dark:border-zinc-800 py-20 text-center">
+            <div className="mx-auto max-w-md px-4">
+              <div className="w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-semibold text-foreground">
+                No applications yet
+              </h3>
+              <p className="mt-2 text-sm text-muted-foreground">
+                When you apply to roles, they'll appear here with live status updates.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <Dialog open={Boolean(withdrawId)} onClose={() => setWithdrawId(null)}>
+          <DialogHeader>
+            <DialogTitle>Withdraw application?</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            {pendingJobTitle
+              ? `You’re about to withdraw from “${pendingJobTitle}”. This can’t be undone, and the employer will no longer see you in their pipeline.`
+              : 'You’re about to withdraw this application. This cannot be undone.'}
+          </DialogDescription>
+          <div className="mt-4 flex justify-end gap-2 text-xs">
+            <button
+              type="button"
+              onClick={() => setWithdrawId(null)}
+              className="px-4 py-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={confirmWithdraw}
+              className="px-4 py-2 rounded-lg bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors font-medium"
+            >
+              Withdraw
+            </button>
+          </div>
+        </Dialog>
+      </div>
+    </DashboardLayout>
   );
 };
 

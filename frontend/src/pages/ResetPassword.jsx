@@ -1,68 +1,104 @@
 import React, { useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Lock, ArrowRight, CheckCircle } from 'lucide-react';
+import { useToast } from '../components/ui/toast';
+import { motion } from 'framer-motion';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const [newPassword, setNewPassword] = useState('');
   const [status, setStatus] = useState('idle');
-  const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
   const token = searchParams.get('token');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('pending');
-    setMessage('');
     try {
       await axios.post('/api/auth/reset-password', null, { params: { token, newPassword } });
       setStatus('success');
-      setMessage('Password reset successfully! You can now log in.');
+      toast({
+        title: "Success",
+        description: "Password reset successfully! Redirecting to login...",
+        type: "success"
+      });
+      setTimeout(() => navigate('/login'), 2000);
     } catch {
       setStatus('error');
-      setMessage('Failed to reset password. The link may be invalid or expired.');
+      toast({
+        title: "Error",
+        description: "Failed to reset password. The link to reset your password may be invalid or expired.",
+        type: "error"
+      });
     }
   };
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
-        <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center border border-slate-200 dark:border-zinc-700">
-          <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Reset Password</h2>
-          <p className="text-red-600 dark:text-red-400">Invalid or missing reset token.</p>
+      <AuthLayout title="Invalid Link" subtitle="Please request a new password reset link.">
+        <div className="text-center">
+          <Link to="/request-password-reset">
+            <Button className="w-full">
+              Request New Link
+            </Button>
+          </Link>
         </div>
-      </div>
+      </AuthLayout>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
-      <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center border border-slate-200 dark:border-zinc-700">
-        <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Reset Password</h2>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="password"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={e => setNewPassword(e.target.value)}
-            minLength={8}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-primary-600 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition"
-            disabled={status === 'pending'}
+    <AuthLayout
+      title="Reset Password"
+      subtitle="Enter your new password below."
+    >
+      {status === 'success' ? (
+        <div className="text-center space-y-4">
+          <motion.div
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-500 rounded-full flex items-center justify-center"
           >
+            <CheckCircle className="w-8 h-8" />
+          </motion.div>
+          <h3 className="text-xl font-bold">Password Reset!</h3>
+          <p className="text-muted-foreground">Redirecting you to login...</p>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none" htmlFor="password">
+              New Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={newPassword}
+                onChange={e => setNewPassword(e.target.value)}
+                minLength={8}
+                required
+                className="pl-9"
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Must be at least 8 characters long.</p>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={status === 'pending'}>
             {status === 'pending' ? 'Resetting...' : 'Reset Password'}
-          </button>
+            {!status === 'pending' && <ArrowRight className="ml-2 w-4 h-4" />}
+          </Button>
         </form>
-        {message && <p className={`mt-4 ${status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{message}</p>}
-        {status === 'success' && (
-          <Link to="/login" className="inline-block mt-4 bg-primary-600 text-white px-6 py-2 rounded hover:bg-primary-700">Go to Login</Link>
-        )}
-      </div>
-    </div>
+      )}
+    </AuthLayout>
   );
 };
 

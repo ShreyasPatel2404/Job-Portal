@@ -1,0 +1,247 @@
+{
+    "users": [
+        {
+            "role": "ADMIN",
+            "email": "admin@jobportal.com",
+            "password": "Admin@123",
+            "fullName": "System Administrator",
+            "verified": true,
+            "bio": "Managing the platform operations."
+        },
+        {
+            "role": "EMPLOYER",
+            "email": "tech@innovate.com",
+            "password": "Tech@123",
+            "fullName": "Sarah Connor",
+            "verified": true,
+            "company": {
+                "name": "Tech Innovators Inc.",
+                "description": "Pioneering the future of AI and Robotics.",
+                "website": "https://techinnovators.com",
+                "location": "San Francisco, CA",
+                "industry": "Technology",
+                "size": "500+",
+                "foundedYear": 2010
+            }
+        },
+        {
+            "role": "EMPLOYER",
+            "email": "hr@greenearth.com",
+            "password": "Green@123",
+            "fullName": "David Attenborough",
+            "verified": true,
+            "company": {
+                "name": "Green Earth Solutions",
+                "description": "Sustainable energy for a better planet.",
+                "website": "https://greenearth.com",
+                "location": "Austin, TX",
+                "industry": "Energy",
+                "size": "51-200",
+                "foundedYear": 2015
+            }
+        },
+        {
+            "role": "APPLICANT",
+            "email": "john.doe@email.com",
+            "password": "John@123",
+            "fullName": "John Doe",
+            "verified": true,
+            "bio": "Full Stack Developer with 5 years of experience.",
+            "skills": [
+                "Java",
+                "Spring Boot",
+                "React",
+                "AWS"
+            ],
+            "resume": {
+                "fileName": "John_Doe_Resume.pdf",
+                "url": "/resumes/john_doe.pdf",
+                "size": 102405,
+                "type": "pdf"
+            }
+        },
+        {
+            "role": "APPLICANT",
+            "email": "alice.smith@email.com",
+            "password": "Alice@123",
+            "fullName": "Alice Smith",
+            "verified": true,
+            "bio": "Creative UI/UX Designer passionate about user-centric design.",
+            "skills": [
+                "Figma",
+                "Adobe XD",
+                "CSS",
+                "Tailwind"
+            ],
+            "resume": {
+                "fileName": "Alice_Smith_CV.pdf",
+                "url": "/resumes/alice_smith.pdf",
+                "size": 204800,
+                "type": "pdf"
+            }
+        },
+        {
+            "role": "APPLICANT",
+            "email": "bob.wilson@email.com",
+            "password": "Bob@123",
+            "fullName": "Bob Wilson",
+            "verified": true,
+            "bio": "Backend Engineer specializing in scalability.",
+            "skills": [
+                "Go",
+                "Kubernetes",
+                "Microservices",
+                "Python"
+            ],
+            "resume": {
+                "fileName": "Bob_Wilson_Resume.docx",
+                "url": "/resumes/bob_wilson.docx",
+                "size": 51200,
+                "type": "docx"
+            }
+        }
+    ],
+    "jobs": [
+        {
+            "title": "Senior Java Developer",
+            "description": "We are looking for an experienced Java Developer to lead our backend team. You will be responsible for designing scalable microservices and mentoring junior developers.\n\nResponsibilities:\n- Design and implement RESTful APIs\n- Optimize database queries\n- Collaborate with frontend team\n\nRequirements:\n- 5+ years of Java experience\n- Spring Boot mastery\n- Cloud experience (AWS/Azure)",
+            "company": "Tech Innovators Inc.",
+            "location": "San Francisco, CA",
+            "type": "Full-time",
+            "postedBy": "tech@innovate.com",
+            "requirements": [
+                "Java",
+                "Spring Boot",
+                "Microservices",
+                "AWS"
+            ],
+            "skills": [
+                "Java",
+                "Spring Boot",
+                "System Design"
+            ],
+            "salary": 150000,
+            "status": "active",
+            "category": "Engineering",
+            "experienceLevel": "Senior"
+        },
+        {
+            "title": "UI/UX Designer",
+            "description": "Join our creative team to build beautiful and intuitive user interfaces. You will work closely with product managers to define user flows.\n\nRequirements:\n- Strong portfolio\n- Proficiency in Figma",
+            "company": "Tech Innovators Inc.",
+            "location": "Remote",
+            "type": "Contract",
+            "postedBy": "tech@innovate.com",
+            "requirements": [
+                "Figma",
+                "Prototyping",
+                "User Research"
+            ],
+            "skills": [
+                "Figma",
+                "UI Design",
+                "UX Research"
+            ],
+            "salary": 90000,
+            "status": "active",
+            "category": "Design",
+            "experienceLevel": "Mid"
+        },
+        {
+            "title": "Renewable Energy Analyst",
+            "description": "Analyze market trends and energy consumption patterns to optimize our solar solutions.",
+            "company": "Green Earth Solutions",
+            "location": "Austin, TX",
+            "type": "Full-time",
+            "postedBy": "hr@greenearth.com",
+            "requirements": [
+                "Data Analysis",
+                "Python",
+                "Energy Sector knowledge"
+            ],
+            "skills": [
+                "Data Analysis",
+                "Python",
+                "Excel"
+            ],
+            "salary": 85000,
+            "status": "active",
+            "category": "Analyst",
+            "experienceLevel": "Mid"
+        },
+        {
+            "title": "DevOps Engineer",
+            "description": "Maintain and improve our CI/CD pipelines.",
+            "company": "Green Earth Solutions",
+            "location": "Remote",
+            "type": "Part-time",
+            "postedBy": "hr@greenearth.com",
+            "requirements": [
+                "Jenkins",
+                "Docker",
+                "Linux"
+            ],
+            "skills": [
+                "DevOps",
+                "CI/CD",
+                "Linux"
+            ],
+            "salary": 60000,
+            "status": "closed",
+            "category": "Engineering",
+            "experienceLevel": "Junior"
+        }
+    ],
+    "applications": [
+        {
+            "jobTitle": "Senior Java Developer",
+            "applicant": "john.doe@email.com",
+            "status": "shortlisted",
+            "resume": "/resumes/john_doe.pdf",
+            "coverLetter": "I have been following Tech Innovators for years and would love to contribute..."
+        },
+        {
+            "jobTitle": "UI/UX Designer",
+            "applicant": "alice.smith@email.com",
+            "status": "pending",
+            "resume": "/resumes/alice_smith.pdf"
+        },
+        {
+            "jobTitle": "Renewable Energy Analyst",
+            "applicant": "john.doe@email.com",
+            "status": "rejected",
+            "resume": "/resumes/john_doe.pdf",
+            "rejectionReason": "Looking for more domain specific experience."
+        }
+    ],
+    "notifications": [
+        {
+            "recipient": "john.doe@email.com",
+            "message": "Your application for Senior Java Developer has been shortlisted! Checks your email for interview details.",
+            "read": false,
+            "type": "application_update"
+        },
+        {
+            "recipient": "tech@innovate.com",
+            "message": "New application for UI/UX Designer from Alice Smith.",
+            "read": true,
+            "type": "new_application"
+        }
+    ],
+    "companyReviews": [
+        {
+            "company": "Tech Innovators Inc.",
+            "author": "john.doe@email.com",
+            "title": "Innovative but demanding",
+            "comment": "The projects are cutting edge, but the deadlines can be tight.",
+            "rating": 4
+        },
+        {
+            "company": "Green Earth Solutions",
+            "author": "alice.smith@email.com",
+            "title": "Great mission",
+            "comment": "Love working for a cause. Great work-life balance.",
+            "rating": 5
+        }
+    ]
+}

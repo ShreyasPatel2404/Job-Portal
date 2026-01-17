@@ -10,12 +10,12 @@ export const Progress = ({ value = 0, className }) => {
       aria-valuenow={clamped}
       role="progressbar"
       className={cn(
-        'relative h-2 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-zinc-800',
+        'relative h-2 w-full overflow-hidden rounded-full bg-secondary',
         className
       )}
     >
       <div
-        className="h-full w-full flex-1 bg-gradient-to-r from-primary-500 via-primary-400 to-primary-600 transition-transform duration-300 ease-out"
+        className="h-full w-full flex-1 bg-primary transition-transform duration-300 ease-in-out"
         style={{ transform: `translateX(-${100 - clamped}%)` }}
       />
     </div>

@@ -1,49 +1,93 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { AuthLayout } from '../components/layout/AuthLayout';
+import { Input } from '../components/ui/input';
+import { Button } from '../components/ui/button';
+import { Mail, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useToast } from '../components/ui/toast';
 
 const RequestPasswordReset = () => {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle');
-  const [message, setMessage] = useState('');
+  const { toast } = useToast();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus('pending');
-    setMessage('');
     try {
       await axios.post('/api/auth/request-password-reset', null, { params: { email } });
       setStatus('success');
-      setMessage('Password reset email sent! Check your inbox.');
+      toast({
+        title: "Reset link sent",
+        description: "Check your email for password reset instructions.",
+        type: "success"
+      });
     } catch {
       setStatus('error');
-      setMessage('Failed to send reset email.');
+      toast({
+        title: "Error",
+        description: "Failed to send reset email. Please try again.",
+        type: "error"
+      });
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950">
-      <div className="max-w-md w-full bg-white dark:bg-zinc-800 shadow-xl rounded-2xl p-8 md:p-10 text-center border border-slate-200 dark:border-zinc-700">
-        <h2 className="text-2xl font-bold mb-4 text-zinc-900 dark:text-white">Forgot Password?</h2>
+    <AuthLayout
+      title="Forgot Password?"
+      subtitle="Enter your email to receive reset instructions."
+    >
+      {status === 'success' ? (
+        <div className="text-center space-y-6">
+          <div className="w-16 h-16 mx-auto bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-500 rounded-full flex items-center justify-center">
+            <Mail className="w-8 h-8" />
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-xl font-bold">Check your inbox</h3>
+            <p className="text-muted-foreground">
+              We've sent password reset instructions to <strong>{email}</strong>
+            </p>
+          </div>
+          <Link to="/login" className="block pt-2">
+            <Button variant="outline" className="w-full">
+              Back to Login
+            </Button>
+          </Link>
+        </div>
+      ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
-          <input
-            type="email"
-            className="w-full px-3 py-2 border border-gray-300 dark:border-zinc-700 rounded-md bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white"
-            placeholder="Enter your email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-          <button
-            type="submit"
-            className="w-full bg-primary-600 text-white font-semibold px-6 py-2 rounded-lg shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition"
-            disabled={status === 'pending'}
-          >
+          <div className="space-y-2">
+            <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70" htmlFor="email">
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="email"
+                type="email"
+                placeholder="name@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                required
+                className="pl-9"
+              />
+            </div>
+          </div>
+
+          <Button type="submit" className="w-full" disabled={status === 'pending'}>
             {status === 'pending' ? 'Sending...' : 'Send Reset Email'}
-          </button>
+            {!status === 'pending' && <ArrowRight className="ml-2 w-4 h-4" />}
+          </Button>
+
+          <div className="text-center">
+            <Link to="/login" className="text-sm text-muted-foreground hover:text-primary flex items-center justify-center gap-1 transition-colors">
+              <ArrowLeft className="w-4 h-4" /> Back to Login
+            </Link>
+          </div>
         </form>
-        {message && <p className={`mt-4 ${status === 'success' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>{message}</p>}
-      </div>
-    </div>
+      )}
+    </AuthLayout>
   );
 };
 

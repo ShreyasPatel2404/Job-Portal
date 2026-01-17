@@ -3,25 +3,22 @@ import { cn } from '../../utils/cn';
 
 export const Badge = ({ className, variant = 'default', ...props }) => {
   const base =
-    'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors';
+    'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2';
 
   const variants = {
     default:
-      'border-transparent bg-primary-50 text-primary-700 dark:bg-primary-900/30 dark:text-primary-300',
+      'border-transparent bg-primary text-primary-foreground hover:bg-primary/80',
     secondary:
-      'border-transparent bg-gray-100 text-gray-700 dark:bg-zinc-800 dark:text-gray-200',
-    outline:
-      'border-gray-300 text-gray-700 dark:border-zinc-700 dark:text-gray-200',
-    success:
-      'border-transparent bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300',
-    warning:
-      'border-transparent bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300',
+      'border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80',
     destructive:
-      'border-transparent bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-300',
+      'border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80',
+    outline: 'text-foreground',
+    success: 'border-transparent bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-500/25',
+    warning: 'border-transparent bg-amber-500/15 text-amber-700 dark:text-amber-400 hover:bg-amber-500/25',
   };
 
   return (
-    <span className={cn(base, variants[variant], className)} {...props} />
+    <div className={cn(base, variants[variant], className)} {...props} />
   );
 };
 

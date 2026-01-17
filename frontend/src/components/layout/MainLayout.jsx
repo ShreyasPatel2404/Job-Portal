@@ -1,0 +1,14 @@
+import React from 'react';
+import { TopNav } from './TopNav';
+import { Footer } from './Footer';
+
+export const MainLayout = ({ children }) => {
+    return (
+        <div className="flex min-h-screen flex-col bg-background">
+            <TopNav />
+            <main className="flex-1">{children}</main>
+            {/* Footer can go here */}
+            <Footer />
+        </div>
+    );
+};

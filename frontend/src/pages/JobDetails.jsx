@@ -4,9 +4,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { jobService } from '../services/jobService';
 import { applicationService } from '../services/applicationService';
 import { useAuth } from '../context/AuthContext';
-import { Sparkles, ListChecks } from 'lucide-react';
+import { Sparkles, ListChecks, ArrowLeft, Building2, MapPin, Calendar, CheckCircle2 } from 'lucide-react';
 import { Badge } from '../components/ui/badge';
 import { Progress } from '../components/ui/progress';
+import { motion } from 'framer-motion';
+import { MainLayout } from '../components/layout/MainLayout';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -52,9 +54,9 @@ const JobDetails = () => {
       setSuccessMsg('Application submitted successfully!');
       setTimeout(() => navigate('/applications'), 1200);
     } catch (error) {
-      const errorMessage = error.response?.data?.error?.message 
-        || error.response?.data?.message 
-        || error.message 
+      const errorMessage = error.response?.data?.error?.message
+        || error.response?.data?.message
+        || error.message
         || 'Failed to submit application';
       setErrorMsg(errorMessage);
     } finally {
@@ -64,18 +66,25 @@ const JobDetails = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-16 flex flex-col items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mb-4"></div>
-        <span className="text-lg text-gray-600 dark:text-gray-300">Loading job details...</span>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 dark:bg-zinc-950">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4" />
+        <span className="text-lg text-muted-foreground">Loading job details...</span>
       </div>
     );
   }
 
   if (!job) {
     return (
-      <div className="container mx-auto px-4 py-16 text-center">
-        <div className="inline-block bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-200 px-4 py-2 rounded shadow">
-          Job not found
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-zinc-950 px-4">
+        <div className="text-center p-8 glass-card rounded-2xl max-w-md w-full">
+          <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center text-red-600 mb-4">
+            <Building2 className="w-6 h-6" />
+          </div>
+          <h3 className="text-xl font-bold mb-2">Job not found</h3>
+          <p className="text-muted-foreground mb-6">This job posting may have been removed or expired.</p>
+          <button onClick={() => navigate('/jobs')} className="px-4 py-2 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors">
+            Browse Jobs
+          </button>
         </div>
       </div>
     );
@@ -85,165 +94,179 @@ const JobDetails = () => {
   const skills = job.skills || job.requiredSkills || [];
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <div className="relative mx-auto max-w-4xl rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 md:p-10">
-        <div className="absolute -top-8 left-1/2 -translate-x-1/2 flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-primary-100 shadow-lg dark:border-zinc-900 dark:bg-primary-900">
-          <svg className="h-8 w-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 01-8 0m8 0a4 4 0 00-8 0m8 0V5a4 4 0 00-8 0v2m8 0a4 4 0 01-8 0m8 0v2a4 4 0 01-8 0V7m8 0a4 4 0 00-8 0" /></svg>
+    <MainLayout>
+      <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 py-12 px-4 sm:px-6 relative overflow-hidden">
+        {/* Background elements */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute top-0 right-[-10%] w-[600px] h-[600px] rounded-full bg-primary/5 blur-[100px]" />
+          <div className="absolute bottom-0 left-[-10%] w-[600px] h-[600px] rounded-full bg-violet-500/5 blur-[100px]" />
         </div>
-        <h1 className="mt-10 text-center text-2xl font-semibold text-zinc-900 dark:text-white md:text-3xl">
-          {job.title}
-        </h1>
-        <p className="mt-1 text-center text-sm font-medium text-primary-600 dark:text-primary-400">
-          {job.company}
-        </p>
-        <p className="mt-1 text-center text-xs text-gray-500 dark:text-gray-400">
-          {job.location} • {job.jobType}
-        </p>
 
-        {/* AI match insights */}
-        {(matchScore != null || skills.length > 0) && (
-          <div className="mt-6 rounded-xl border border-dashed border-primary-200 bg-primary-50/70 p-4 text-xs dark:border-primary-800 dark:bg-primary-950/40">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-white">
-                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold text-primary-900 dark:text-primary-100">
-                    AI match insights
-                  </p>
-                  <p className="text-[11px] text-primary-900/80 dark:text-primary-100/80">
-                    Based on your profile and this role’s requirements.
-                  </p>
+        <div className="max-w-4xl mx-auto relative z-10">
+          <button onClick={() => navigate(-1)} className="mb-6 flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+            <ArrowLeft className="w-4 h-4" /> Back to jobs
+          </button>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card rounded-3xl p-6 md:p-10 shadow-xl border border-white/20 dark:border-zinc-800 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-xl"
+          >
+            <div className="flex flex-col md:flex-row gap-6 mb-8 items-start">
+              <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary/10 to-violet-500/10 flex items-center justify-center border border-white/50 dark:border-white/10 shadow-inner">
+                {job.companyLogo ? (
+                  <img src={job.companyLogo} alt={job.company} className="w-full h-full object-cover rounded-2xl" />
+                ) : (
+                  <Building2 className="w-8 h-8 md:w-10 md:h-10 text-primary" />
+                )}
+              </div>
+              <div className="flex-1">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">{job.title}</h1>
+                <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-zinc-800 font-medium">
+                    <Building2 className="w-3.5 h-3.5" />
+                    {job.company}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {job.location}
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Calendar className="w-3.5 h-3.5" />
+                    {job.jobType}
+                  </span>
                 </div>
               </div>
-              {matchScore != null && (
-                <Badge
-                  variant={matchScore >= 85 ? 'success' : 'secondary'}
-                  className="shrink-0 text-[10px]"
-                >
-                  Match {matchScore}%
-                </Badge>
-              )}
             </div>
-            {matchScore != null && (
-              <div className="mt-3">
-                <Progress value={matchScore} />
-              </div>
-            )}
-            {skills.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {skills.slice(0, 6).map((skill) => (
-                  <Badge key={skill} variant="outline" className="text-[10px]">
-                    {skill}
-                  </Badge>
-                ))}
-                {skills.length > 6 && (
-                  <span className="text-[10px] text-primary-700 dark:text-primary-300">
-                    +{skills.length - 6} more
-                  </span>
+
+            {/* AI Match */}
+            {(matchScore != null || skills.length > 0) && (
+              <div className="mb-8 p-5 rounded-2xl bg-gradient-to-r from-violet-500/5 to-primary/5 border border-primary/10">
+                <div className="flex items-center justify-between gap-4 mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-sm text-foreground">AI Sustainability Match</h4>
+                      <p className="text-xs text-muted-foreground">Analysis based on your profile.</p>
+                    </div>
+                  </div>
+                  {matchScore != null && (
+                    <Badge variant={matchScore >= 85 ? 'success' : 'secondary'} className="text-xs">
+                      {matchScore}% Match
+                    </Badge>
+                  )}
+                </div>
+                {matchScore != null && <Progress value={matchScore} className="h-2 mb-4" />}
+
+                {skills.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {skills.slice(0, 8).map((skill, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-lg text-xs font-medium bg-white dark:bg-zinc-800 border border-slate-200 dark:border-zinc-700 text-foreground shadow-sm">
+                        {skill}
+                      </span>
+                    ))}
+                    {skills.length > 8 && <span className="text-xs text-muted-foreground self-center">+{skills.length - 8} more</span>}
+                  </div>
                 )}
               </div>
             )}
-          </div>
-        )}
 
-        <div className="mt-8 grid gap-8 md:grid-cols-[minmax(0,2fr),minmax(0,1.4fr)]">
-          <div>
-            <div className="mb-6">
-              <h2 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                Description
-              </h2>
-              <p className="whitespace-pre-line text-xs leading-relaxed text-gray-700 dark:text-gray-300">
-                {job.description}
-              </p>
+            <div className="grid gap-10 md:grid-cols-[2fr,1.2fr]">
+              <div className="space-y-8">
+                <section>
+                  <h2 className="text-lg font-semibold text-foreground mb-3">About the Role</h2>
+                  <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground leading-relaxed">
+                    {job.description}
+                  </div>
+                </section>
+
+                {job.requirements && job.requirements.length > 0 && (
+                  <section>
+                    <h2 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
+                      <ListChecks className="w-5 h-5 text-primary" />
+                      Requirements
+                    </h2>
+                    <ul className="space-y-2">
+                      {job.requirements.map((req, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-muted-foreground">
+                          <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                            <CheckCircle2 className="w-3 h-3" />
+                          </span>
+                          {req}
+                        </li>
+                      ))}
+                    </ul>
+                  </section>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                {isAuthenticated && user?.accountType === 'APPLICANT' ? (
+                  <div className="sticky top-24 p-6 rounded-2xl bg-white dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 shadow-sm">
+                    <h3 className="font-semibold text-foreground mb-4">Apply Now</h3>
+
+                    {successMsg && (
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-3 rounded-xl bg-green-50 text-green-700 text-sm border border-green-200 dark:bg-green-900/20 dark:border-green-900/30 dark:text-green-300">
+                        {successMsg}
+                      </motion.div>
+                    )}
+                    {errorMsg && (
+                      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-4 p-3 rounded-xl bg-red-50 text-red-700 text-sm border border-red-200 dark:bg-red-900/20 dark:border-red-900/30 dark:text-red-300">
+                        {errorMsg}
+                      </motion.div>
+                    )}
+
+                    <form onSubmit={handleApply} className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold uppercase text-muted-foreground mb-1.5" htmlFor="resumeUrl">Resume URL <span className="text-red-500">*</span></label>
+                        <input
+                          id="resumeUrl"
+                          value={applicationData.resumeUrl}
+                          onChange={(e) => setApplicationData({ ...applicationData, resumeUrl: e.target.value })}
+                          required
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 outline-none text-sm transition-all"
+                          placeholder="https://..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold uppercase text-muted-foreground mb-1.5" htmlFor="coverLetter">Cover Letter</label>
+                        <textarea
+                          id="coverLetter"
+                          value={applicationData.coverLetter}
+                          onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
+                          className="w-full px-3 py-2 rounded-xl bg-slate-50 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 focus:ring-2 focus:ring-primary/20 outline-none text-sm transition-all min-h-[100px] resize-y"
+                          placeholder="Why are you a good fit?"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={applying}
+                        className="w-full py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-all hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {applying ? 'Submitting...' : 'Submit Application'}
+                      </button>
+                    </form>
+                  </div>
+                ) : !isAuthenticated ? (
+                  <div className="p-6 rounded-2xl bg-slate-50 dark:bg-zinc-800/50 border border-slate-200 dark:border-zinc-700 text-center">
+                    <h3 className="font-semibold mb-2">Interested in this role?</h3>
+                    <p className="text-sm text-muted-foreground mb-4">Sign in to apply and track your application status.</p>
+                    <button onClick={() => navigate('/login')} className="w-full py-2.5 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all">
+                      Sign In to Apply
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             </div>
-
-            {job.requirements && job.requirements.length > 0 && (
-              <div className="mb-4">
-                <h2 className="mb-2 flex items-center gap-1.5 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-                  <ListChecks className="h-3.5 w-3.5 text-primary-500" aria-hidden="true" />
-                  Requirements
-                </h2>
-                <ul className="space-y-1 text-xs text-gray-700 dark:text-gray-300">
-                  {job.requirements.map((req, index) => (
-                    <li key={index} className="flex gap-1.5">
-                      <span className="mt-1 h-1 w-1 rounded-full bg-gray-400" />
-                      <span>{req}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-
-          {isAuthenticated && user?.accountType === 'APPLICANT' && (
-          <div className="mt-10 border-t border-gray-200 pt-8 dark:border-zinc-700">
-            <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-white">Apply for this job</h2>
-            {successMsg && (
-              <div className="mb-4 px-4 py-2 rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 shadow">
-                {successMsg}
-              </div>
-            )}
-            {errorMsg && (
-              <div className="mb-4 px-4 py-2 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 shadow">
-                {errorMsg}
-              </div>
-            )}
-            <form onSubmit={handleApply} className="space-y-4 text-xs">
-              <div>
-                <label
-                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
-                  htmlFor="resumeUrl"
-                >
-                  Resume URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="resumeUrl"
-                  type="url"
-                  required
-                  value={applicationData.resumeUrl}
-                  onChange={(e) => setApplicationData({ ...applicationData, resumeUrl: e.target.value })}
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  placeholder="https://your-resume-link.com"
-                  autoComplete="off"
-                />
-              </div>
-              <div>
-                <label
-                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
-                  htmlFor="coverLetter"
-                >
-                  Cover letter <span className="text-[10px] text-gray-400">(optional)</span>
-                </label>
-                <textarea
-                  id="coverLetter"
-                  value={applicationData.coverLetter}
-                  onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  rows="4"
-                  placeholder="Write your cover letter..."
-                />
-              </div>
-              <button
-                type="submit"
-
-                disabled={applying}
-                className="w-full rounded-lg bg-primary-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition disabled:cursor-not-allowed disabled:opacity-50"
-                aria-busy={applying}
-              >
-                {applying ? (
-                  <span className="flex items-center justify-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>Submitting...</span>
-                ) : 'Submit application'}
-              </button>
-            </form>
-          </div>
-        )}
+          </motion.div>
+        </div>
       </div>
-    </div>
-  </div>
+    </MainLayout>
   );
 };
 
 export default JobDetails;
+
 

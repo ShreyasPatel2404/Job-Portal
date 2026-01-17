@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { savedJobService } from '../services/savedJobService';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Bookmark, MapPin, Building2, Briefcase, ArrowRight, Trash2, ArrowUpRight } from 'lucide-react';
+import { DashboardLayout } from '../components/layout/DashboardLayout';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 
 const SavedJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -22,87 +27,107 @@ const SavedJobs = () => {
 
   const handleUnsave = async (jobId) => {
     await savedJobService.unsaveJob(jobId);
-    fetchSavedJobs();
+    setJobs(jobs.filter(job => job.id !== jobId));
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl bg-slate-50 dark:bg-zinc-950 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">Saved Jobs</h1>
-        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
-          Your bookmarked job opportunities
-        </p>
-      </div>
-      {loading ? (
-        <div className="py-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading saved jobs...</p>
-        </div>
-      ) : jobs.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {jobs.map(job => (
-            <div 
-              key={job.id} 
-              className="group rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition-all duration-200 hover:border-primary-300 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900 dark:hover:border-primary-700"
-            >
-              <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white line-clamp-2">
-                {job.title}
-              </h3>
-              <p className="text-base font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                {job.company}
-              </p>
-              <p className="text-base text-gray-500 dark:text-gray-400 mb-1">
-                {job.location}
-              </p>
-              <p className="text-xs text-gray-400 dark:text-gray-500 mb-4">
-                {job.jobType}
-              </p>
-              <div className="flex items-center justify-between gap-3 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                <Link 
-                  to={`/jobs/${job.id}`} 
-                  className="text-sm font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-300 dark:hover:text-primary-200 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 rounded"
-                >
-                  View Details
-                  <span className="ml-1" aria-hidden="true">→</span>
-                </Link>
-                <button 
-                  onClick={() => handleUnsave(job.id)} 
-                  className="text-sm font-medium text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 rounded"
-                  aria-label={`Unsave ${job.title}`}
-                >
-                  Unsave
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto max-w-md px-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"
-              />
-            </svg>
-            <h3 className="mt-4 text-sm font-semibold text-gray-900 dark:text-gray-50">
-              No saved jobs
-            </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Start saving jobs you're interested in to view them here later.
-            </p>
+    <DashboardLayout
+      role="APPLICANT"
+      title="Saved Opportunities"
+      description="Manage and review your bookmarked positions."
+    >
+      <div className="relative z-10">
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-48 rounded-2xl bg-slate-100 dark:bg-zinc-800 animate-pulse" />
+            ))}
           </div>
-        </div>
-      )}
-    </div>
+        ) : jobs.length > 0 ? (
+          <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence>
+              {jobs.map((job) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                  key={job.id}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white/50 p-5 hover:border-primary/50 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:bg-zinc-900 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
+                >
+                  <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleUnsave(job.id)}
+                      className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 dark:bg-zinc-800 dark:hover:bg-red-900/20 transition-colors"
+                      title="Remove from saved"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 group-hover:scale-105 transition-transform">
+                        <Building2 className="w-6 h-6 text-primary" />
+                      </div>
+                      <Badge variant="outline" className="text-[10px] font-medium">
+                        {job.jobType}
+                      </Badge>
+                    </div>
+
+                    <h3 className="text-lg font-bold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+                      {job.title}
+                    </h3>
+                    <p className="text-sm font-medium text-muted-foreground mb-4">{job.company}</p>
+
+                    <div className="space-y-2 mb-6">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {job.location}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Briefcase className="w-3.5 h-3.5" />
+                        {job.experienceLevel || "Not specified"}
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    to={`/jobs/${job.id}`}
+                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 text-sm font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
+                  >
+                    View Details
+                    <ArrowUpRight className="w-4 h-4" />
+                  </Link>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center justify-center py-20 text-center"
+          >
+            <div className="w-20 h-20 bg-slate-100 dark:bg-zinc-800/50 rounded-full flex items-center justify-center mb-6">
+              <Bookmark className="w-8 h-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">
+              No saved jobs yet
+            </h3>
+            <p className="text-muted-foreground max-w-sm mx-auto mb-8">
+              Jobs you bookmark will appear here. Start exploring opportunities to build your collection.
+            </p>
+            <Link to="/jobs">
+              <Button>
+                Explore Jobs
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </motion.div>
+        )}
+      </div>
+    </DashboardLayout>
   );
 };
 

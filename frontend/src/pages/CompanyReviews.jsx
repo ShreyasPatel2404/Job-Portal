@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { Star, Building2, UserCircle, Calendar } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { MainLayout } from '../components/layout/MainLayout';
 
 const CompanyReviews = () => {
   const { companyId } = useParams();
@@ -12,72 +15,83 @@ const CompanyReviews = () => {
   }, [companyId]);
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl bg-slate-50 dark:bg-zinc-950 min-h-screen">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white sm:text-4xl">Company Reviews</h1>
-        <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
-          Read what others are saying about this company
-        </p>
-      </div>
-      {loading ? (
-        <div className="py-12 text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
-          <p className="text-sm text-gray-500 dark:text-gray-400">Loading reviews...</p>
-        </div>
-      ) : reviews.length > 0 ? (
-        <div className="space-y-4">
-          {reviews.map((review, idx) => (
-            <article 
-              key={idx} 
-              className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">
-                {review.title}
-              </h3>
-              <p className="text-base text-gray-600 dark:text-gray-300 leading-relaxed mb-4">
-                {review.comment}
-              </p>
-              <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 pt-4 border-t border-gray-100 dark:border-zinc-800">
-                <span>By {review.author}</span>
-                <span aria-hidden="true">•</span>
-                <time dateTime={review.createdAt}>
-                  {new Date(review.createdAt).toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </time>
-              </div>
-            </article>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border border-slate-200 bg-slate-50 py-12 text-center dark:border-zinc-800 dark:bg-zinc-900">
-          <div className="mx-auto max-w-md px-4">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
-              />
-            </svg>
-            <h3 className="mt-4 text-sm font-semibold text-gray-900 dark:text-gray-50">
-              No reviews yet
-            </h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-              Be the first to share your experience with this company.
+    <MainLayout>
+      <div className="min-h-screen bg-background py-16 px-4 sm:px-6 relative">
+        <div className="absolute inset-0 bg-grid-slate-900/[0.04] dark:bg-grid-white/[0.02] bg-[bottom_1px_center] pointer-events-none" />
+        <div className="max-w-4xl mx-auto space-y-8 relative z-10">
+          <div className="text-center md:text-left mb-8">
+            <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-400">
+              Company Reviews
+            </h1>
+            <p className="mt-2 text-lg text-muted-foreground">
+              See what employees are saying about their experience.
             </p>
           </div>
+
+          {loading ? (
+            <div className="py-20 text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-4" />
+              <p className="text-sm text-muted-foreground">Loading reviews...</p>
+            </div>
+          ) : reviews.length > 0 ? (
+            <div className="space-y-6">
+              {reviews.map((review, idx) => (
+                <motion.article
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  key={idx}
+                  className="glass-card rounded-xl p-6 hover:shadow-lg transition-all duration-300"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-primary/10 rounded-lg">
+                        <UserCircle className="w-6 h-6 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground">{review.title}</h3>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span>{review.author}</span>
+                          <span>•</span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(review.createdAt).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex bg-amber-100 dark:bg-amber-900/30 px-2 py-1 rounded-lg">
+                      {[...Array(5)].map((_, i) => (
+                        <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'text-amber-500 fill-amber-500' : 'text-gray-300 dark:text-gray-600'}`} />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-muted-foreground leading-relaxed pl-12 border-l-2 border-primary/20">
+                    {review.comment}
+                  </p>
+                </motion.article>
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="glass-card rounded-2xl p-16 text-center border-dashed"
+            >
+              <div className="mx-auto w-16 h-16 bg-slate-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mb-6">
+                <Building2 className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                No reviews yet
+              </h3>
+              <p className="text-muted-foreground max-w-md mx-auto">
+                Be the first to share your experience working with this company. Your insights help others make better career decisions.
+              </p>
+            </motion.div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+    </MainLayout>
   );
 };
 

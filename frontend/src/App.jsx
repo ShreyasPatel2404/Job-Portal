@@ -16,7 +16,7 @@ import EmployerDashboard from './pages/dashboard/EmployerDashboard';
 import JobSeekerDashboard from './pages/dashboard/JobSeekerDashboard';
 
 // Layout
-import { TopNav } from './components/layout/TopNav';
+// Layout
 
 // Pages
 import Home from './pages/Home';
@@ -28,6 +28,8 @@ import VerifyEmail from './pages/VerifyEmail';
 import RequestPasswordReset from './pages/RequestPasswordReset';
 import ResetPassword from './pages/ResetPassword';
 
+import { ToastProvider } from './components/ui/toast';
+
 function App() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -36,110 +38,111 @@ function App() {
 
   return (
     <AuthProvider>
-      <Router>
-        <div className="min-h-screen bg-slate-50 dark:bg-zinc-950">
-          <TopNav onOpenMobileNav={() => setMobileNavOpen(!mobileNavOpen)} />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/jobs" element={<Jobs />} />
-            <Route path="/jobs/:id" element={<JobDetails />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/forgot-password" element={<RequestPasswordReset />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
+      <ToastProvider>
+        <Router>
+          <div className="min-h-screen bg-background">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/jobs" element={<Jobs />} />
+              <Route path="/jobs/:id" element={<JobDetails />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="/forgot-password" element={<RequestPasswordReset />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
 
-            {/* Company Reviews Route (all users) */}
-            <Route path="/companies/:companyId/reviews" element={<CompanyReviews />} />
+              {/* Company Reviews Route (all users) */}
+              <Route path="/companies/:companyId/reviews" element={<CompanyReviews />} />
 
-            {/* Saved Jobs Route (all authenticated users) */}
-            <Route
-              path="/saved-jobs"
-              element={
-                <ProtectedRoute>
-                  <SavedJobs />
-                </ProtectedRoute>
-              }
-            />
+              {/* Saved Jobs Route (all authenticated users) */}
+              <Route
+                path="/saved-jobs"
+                element={
+                  <ProtectedRoute>
+                    <SavedJobs />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Notifications Route (all authenticated users) */}
-            <Route
-              path="/notifications"
-              element={
-                <ProtectedRoute>
-                  <Notifications />
-                </ProtectedRoute>
-              }
-            />
+              {/* Notifications Route (all authenticated users) */}
+              <Route
+                path="/notifications"
+                element={
+                  <ProtectedRoute>
+                    <Notifications />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Job Seeker Resume Management Route */}
-            <Route
-              path="/dashboard/jobseeker/resumes"
-              element={
-                <ProtectedRoute allowedRoles={['APPLICANT']}>
-                  <ResumeManager />
-                </ProtectedRoute>
-              }
-            />
+              {/* Job Seeker Resume Management Route */}
+              <Route
+                path="/dashboard/jobseeker/resumes"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <ResumeManager />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Employer Applications Management Route */}
-            <Route
-              path="/dashboard/recruiter/applications"
-              element={
-                <ProtectedRoute allowedRoles={['EMPLOYER']}>
-                  <EmployerApplications />
-                </ProtectedRoute>
-              }
-            />
+              {/* Employer Applications Management Route */}
+              <Route
+                path="/dashboard/recruiter/applications"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <EmployerApplications />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Job Seeker Applications Route */}
-            <Route
-              path="/applications"
-              element={
-                <ProtectedRoute allowedRoles={['APPLICANT']}>
-                  <Applications />
-                </ProtectedRoute>
-              }
-            />
+              {/* Job Seeker Applications Route */}
+              <Route
+                path="/applications"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <Applications />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Employer Job Post Route */}
-            <Route
-              path="/jobs/post"
-              element={
-                <ProtectedRoute allowedRoles={['EMPLOYER']}>
-                  <JobPost />
-                </ProtectedRoute>
-              }
-            />
+              {/* Employer Job Post Route */}
+              <Route
+                path="/jobs/post"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <JobPost />
+                  </ProtectedRoute>
+                }
+              />
 
-            {/* Role-based Dashboards */}
-            <Route
-              path="/dashboard/admin"
-              element={
-                <ProtectedRoute allowedRoles={['ADMIN']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/recruiter"
-              element={
-                <ProtectedRoute allowedRoles={['EMPLOYER']}>
-                  <EmployerDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard/jobseeker"
-              element={
-                <ProtectedRoute allowedRoles={['APPLICANT']}>
-                  <JobSeekerDashboard />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </Router>
+              {/* Role-based Dashboards */}
+              <Route
+                path="/dashboard/admin"
+                element={
+                  <ProtectedRoute allowedRoles={['ADMIN']}>
+                    <AdminDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/recruiter"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <EmployerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard/jobseeker"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <JobSeekerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </Router>
+      </ToastProvider>
     </AuthProvider>
   );
 }
