@@ -10,10 +10,12 @@ import ResumeManager from './pages/dashboard/ResumeManager';
 import EmployerApplications from './pages/dashboard/EmployerApplications';
 import Applications from './pages/Applications';
 import JobPost from './pages/JobPost';
+import EmployerJobs from './pages/dashboard/EmployerJobs';
 
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import EmployerDashboard from './pages/dashboard/EmployerDashboard';
 import JobSeekerDashboard from './pages/dashboard/JobSeekerDashboard';
+import Dashboard from './pages/Dashboard';
 
 // Layout
 // Layout
@@ -27,6 +29,7 @@ import JobDetails from './pages/JobDetails';
 import VerifyEmail from './pages/VerifyEmail';
 import RequestPasswordReset from './pages/RequestPasswordReset';
 import ResetPassword from './pages/ResetPassword';
+import Settings from './pages/Settings';
 
 import { ToastProvider } from './components/ui/toast';
 
@@ -114,6 +117,26 @@ function App() {
                 }
               />
 
+              {/* Employer Job Edit Route */}
+              <Route
+                path="/jobs/edit/:id"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <JobPost />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Employer Jobs List Route */}
+              <Route
+                path="/jobs/my-jobs"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <EmployerJobs />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Role-based Dashboards */}
               <Route
                 path="/dashboard/admin"
@@ -132,10 +155,28 @@ function App() {
                 }
               />
               <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute>
+                    <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard/jobseeker"
                 element={
                   <ProtectedRoute allowedRoles={['APPLICANT']}>
                     <JobSeekerDashboard />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Settings Route */}
+              <Route
+                path="/settings"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <Settings />
                   </ProtectedRoute>
                 }
               />

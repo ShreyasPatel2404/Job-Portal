@@ -14,7 +14,7 @@ export const savedJobService = {
     return response.data;
   },
   isJobSaved: async (jobId) => {
-    const response = await api.get(`/saved-jobs/${jobId}/is-saved`);
+    const response = await api.get(`/saved-jobs/${jobId}/check`);
     return response.data;
   },
 };

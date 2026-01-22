@@ -52,11 +52,17 @@ public class User {
 	
 	private Boolean isEmailVerified = false;
 	
+	@Indexed
 	private String emailVerificationToken;
 	
+	private LocalDateTime emailVerificationTokenExpiry;
+	
+	@Indexed
 	private String resetPasswordToken;
 	
 	private LocalDateTime resetPasswordExpires;
+	
+	private LocalDateTime lastLoginAt;
 	
 	@CreatedDate
 	private LocalDateTime createdAt;

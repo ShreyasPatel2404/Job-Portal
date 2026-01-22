@@ -8,5 +8,8 @@ import com.jobportal.entity.User;
 
 public interface UserRepository extends MongoRepository<User, String> {
 	Optional<User> findByEmail(String email);
+	
+	// Indexed queries for token lookups (replaces findAll().stream())
+	Optional<User> findByEmailVerificationToken(String token);
+	Optional<User> findByResetPasswordToken(String token);
 }
-

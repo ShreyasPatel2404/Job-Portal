@@ -9,7 +9,9 @@ import {
   BarChart3,
   Settings,
   CalendarClock,
-  Bookmark
+  Bookmark,
+  List,
+  PlusSquare
 } from 'lucide-react';
 
 // Reusable dashboard layout with responsive sidebar for Recruiter & Admin
@@ -18,7 +20,8 @@ export const DashboardLayout = ({ role, title, description, children }) => {
     role === 'EMPLOYER'
       ? [
         { to: '/dashboard/recruiter', label: 'Overview', icon: LayoutDashboard },
-        { to: '/jobs/post', label: 'Post a Job', icon: Briefcase },
+        { to: '/jobs/post', label: 'Post a Job', icon: PlusSquare },
+        { to: '/jobs/my-jobs', label: 'My Jobs', icon: List },
         { to: '/dashboard/recruiter/applications', label: 'Applications', icon: Users },
         { to: '/dashboard/resumes', label: 'Resumes', icon: FileText },
         { to: '/dashboard/recruiter/interviews', label: 'Interviews', icon: CalendarClock },

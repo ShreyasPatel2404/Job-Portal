@@ -31,3 +31,14 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Project Specific ###
+*.log
+*.zip
+*.bak
+project/
+changes.txt
+backend.log
+build.log
+build_compile.log
+frontend.zip

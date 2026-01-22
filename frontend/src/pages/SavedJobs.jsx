@@ -19,7 +19,12 @@ const SavedJobs = () => {
     setLoading(true);
     try {
       const data = await savedJobService.getSavedJobs();
-      setJobs(data);
+      // Handle Spring Data Page structure (data.content)
+      const savedJobsList = data.content || data;
+      setJobs(Array.isArray(savedJobsList) ? savedJobsList : []);
+    } catch (error) {
+      console.error('Error fetching saved jobs:', error);
+      setJobs([]);
     } finally {
       setLoading(false);
     }
@@ -27,7 +32,7 @@ const SavedJobs = () => {
 
   const handleUnsave = async (jobId) => {
     await savedJobService.unsaveJob(jobId);
-    setJobs(jobs.filter(job => job.id !== jobId));
+    setJobs(jobs.filter(job => job.jobId.id !== jobId));
   };
 
   return (
@@ -46,61 +51,66 @@ const SavedJobs = () => {
         ) : jobs.length > 0 ? (
           <motion.div layout className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <AnimatePresence>
-              {jobs.map((job) => (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-                  key={job.id}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white/50 p-5 hover:border-primary/50 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:bg-zinc-900 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
-                >
-                  <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleUnsave(job.id)}
-                      className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 dark:bg-zinc-800 dark:hover:bg-red-900/20 transition-colors"
-                      title="Remove from saved"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+              {jobs.map((savedJob) => {
+                const job = savedJob.jobId;
+                if (!job) return null;
 
-                  <div>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 group-hover:scale-105 transition-transform">
-                        <Building2 className="w-6 h-6 text-primary" />
-                      </div>
-                      <Badge variant="outline" className="text-[10px] font-medium">
-                        {job.jobType}
-                      </Badge>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
-                      {job.title}
-                    </h3>
-                    <p className="text-sm font-medium text-muted-foreground mb-4">{job.company}</p>
-
-                    <div className="space-y-2 mb-6">
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <MapPin className="w-3.5 h-3.5" />
-                        {job.location}
-                      </div>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <Briefcase className="w-3.5 h-3.5" />
-                        {job.experienceLevel || "Not specified"}
-                      </div>
-                    </div>
-                  </div>
-
-                  <Link
-                    to={`/jobs/${job.id}`}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 text-sm font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
+                return (
+                  <motion.div
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                    key={savedJob.id}
+                    className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200 bg-white/50 p-5 hover:border-primary/50 hover:bg-white dark:border-zinc-800 dark:bg-zinc-900/50 dark:hover:bg-zinc-900 transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                   >
-                    View Details
-                    <ArrowUpRight className="w-4 h-4" />
-                  </Link>
-                </motion.div>
-              ))}
+                    <div className="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleUnsave(job.id)}
+                        className="p-2 rounded-full bg-slate-100 text-slate-500 hover:bg-red-50 hover:text-red-500 dark:bg-zinc-800 dark:hover:bg-red-900/20 transition-colors"
+                        title="Remove from saved"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <div className="flex items-start justify-between mb-4">
+                        <div className="p-2.5 rounded-xl bg-gradient-to-br from-primary/10 to-violet-500/10 group-hover:scale-105 transition-transform">
+                          <Building2 className="w-6 h-6 text-primary" />
+                        </div>
+                        <Badge variant="outline" className="text-[10px] font-medium">
+                          {job.jobType}
+                        </Badge>
+                      </div>
+
+                      <h3 className="text-lg font-bold text-foreground line-clamp-1 mb-1 group-hover:text-primary transition-colors">
+                        {job.title}
+                      </h3>
+                      <p className="text-sm font-medium text-muted-foreground mb-4">{job.company}</p>
+
+                      <div className="space-y-2 mb-6">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <MapPin className="w-3.5 h-3.5" />
+                          {job.location}
+                        </div>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <Briefcase className="w-3.5 h-3.5" />
+                          {job.experienceLevel || "Not specified"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <Link
+                      to={`/jobs/${job.id}`}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 text-sm font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
+                    >
+                      View Details
+                      <ArrowUpRight className="w-4 h-4" />
+                    </Link>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </motion.div>
         ) : (

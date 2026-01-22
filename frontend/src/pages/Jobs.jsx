@@ -44,9 +44,13 @@ const Jobs = () => {
 
   const fetchSavedJobs = async () => {
     try {
-      const data = await savedJobService.getSavedJobs();
-      setSavedJobIds(data.map(j => j.id));
-    } catch {
+      const response = await savedJobService.getSavedJobs();
+      const savedJobsList = response.content || response;
+      if (Array.isArray(savedJobsList)) {
+        setSavedJobIds(savedJobsList.map(j => j.jobId?.id).filter(id => id));
+      }
+    } catch (error) {
+      console.error('Error fetching saved job IDs:', error);
       setSavedJobIds([]);
     }
   };

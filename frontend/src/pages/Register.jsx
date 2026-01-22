@@ -1,13 +1,7 @@
-
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, Briefcase, Loader2, ArrowRight } from 'lucide-react';
-
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Input } from '../components/ui/input';
 import { Button } from '../components/ui/button';
@@ -38,13 +32,23 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await register(formData);
+      const response = await register(formData);
       addToast({
         title: "Account Created!",
         description: "You have successfully registered.",
         type: "success"
       });
-      navigate('/dashboard');
+
+      const accountType = response?.user?.accountType;
+      if (accountType === 'EMPLOYER') {
+        navigate('/dashboard/recruiter');
+      } else if (accountType === 'APPLICANT') {
+        navigate('/dashboard/jobseeker');
+      } else if (accountType === 'ADMIN') {
+        navigate('/dashboard/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       const errorMessage = err.response?.data?.error?.message
         || err.response?.data?.message

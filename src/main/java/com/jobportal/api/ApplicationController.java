@@ -1,7 +1,10 @@
 package com.jobportal.api;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +37,8 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*")
 public class ApplicationController {
 	
+	private static final Logger log = LoggerFactory.getLogger(ApplicationController.class);
+	
 	@Autowired
 	private ApplicationService applicationService;
 	
@@ -48,7 +53,35 @@ public class ApplicationController {
 			@PathVariable String jobId,
 			@Valid @RequestBody ApplicationDTO applicationDTO,
 			Authentication authentication) {
+		
 		User applicant = getCurrentUser(authentication);
+		
+		// Verify user is APPLICANT
+		if (applicant.getAccountType() != com.jobportal.dto.AccountType.APPLICANT) {
+			log.warn("Non-applicant attempted to apply to job: {} - User: {}", jobId, applicant.getEmail());
+			throw new RuntimeException("Only job seekers can apply to jobs");
+		}
+		
+		// Verify job exists and is active
+		Job job = jobRepository.findById(jobId)
+			.orElseThrow(() -> {
+				log.warn("Application attempt for non-existent job: {} by user: {}", jobId, applicant.getEmail());
+				return new RuntimeException("Job not found");
+			});
+		
+		if (!"active".equals(job.getStatus())) {
+			log.warn("Application attempt for inactive job: {} by user: {}", jobId, applicant.getEmail());
+			throw new RuntimeException("This job is no longer accepting applications");
+		}
+		
+		// Check application deadline
+		if (job.getApplicationDeadline() != null && 
+			job.getApplicationDeadline().isBefore(LocalDateTime.now())) {
+			log.warn("Application attempt after deadline for job: {} by user: {}", jobId, applicant.getEmail());
+			throw new RuntimeException("Application deadline has passed");
+		}
+		
+		log.info("Job application submitted: Job {} by user: {}", jobId, applicant.getEmail());
 		ApplicationDTO created = applicationService.applyToJob(jobId, applicationDTO, applicant);
 		return ResponseEntity.status(HttpStatus.CREATED).body(created);
 	}

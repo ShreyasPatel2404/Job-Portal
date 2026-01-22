@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '../components/layout/DashboardLayout';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { jobService } from '../services/jobService';
 import { motion } from 'framer-motion';
 import { Briefcase, Building2, MapPin, DollarSign, Calendar, Globe, Award, Sparkles, CheckCircle2 } from 'lucide-react';
@@ -26,10 +26,32 @@ const initialJob = {
 };
 
 const JobPost = () => {
+  const { id } = useParams();
   const [job, setJob] = useState(initialJob);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (id) {
+      const fetchJob = async () => {
+        try {
+          const data = await jobService.getJobById(id);
+          setJob({
+            ...data,
+            skills: data.skills ? data.skills.join(', ') : '',
+            requirements: data.requirements ? data.requirements.join('\n') : '',
+            responsibilities: data.responsibilities ? data.responsibilities.join('\n') : '',
+            applicationDeadline: data.applicationDeadline ? data.applicationDeadline.split('T')[0] : ''
+          });
+        } catch (err) {
+          console.error("Failed to fetch job", err);
+          setError("Failed to load job details");
+        }
+      };
+      fetchJob();
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -43,11 +65,32 @@ const JobPost = () => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Transform data for backend
+    const payload = {
+      ...job,
+      // Split comma-separated string into array and trim whitespace
+      skills: job.skills ? job.skills.split(',').map(s => s.trim()).filter(s => s.length > 0) : [],
+      // Split new-line separated string into array
+      requirements: job.requirements ? job.requirements.split('\n').map(s => s.trim()).filter(s => s.length > 0) : [],
+      responsibilities: job.responsibilities ? job.responsibilities.split('\n').map(s => s.trim()).filter(s => s.length > 0) : [],
+      // Ensure numeric values are numbers
+      salaryMin: Number(job.salaryMin) || 0,
+      salaryMax: Number(job.salaryMax) || 0,
+      // Format date for LocalDateTime (YYYY-MM-DD -> YYYY-MM-DDTHH:mm:ss)
+      applicationDeadline: job.applicationDeadline ? (job.applicationDeadline.includes('T') ? job.applicationDeadline : `${job.applicationDeadline}T23:59:59`) : null,
+    };
+
     try {
-      await jobService.createJob(job);
-      navigate('/dashboard/recruiter');
+      if (id) {
+        await jobService.updateJob(id, payload);
+      } else {
+        await jobService.createJob(payload);
+      }
+      navigate('/jobs/my-jobs');
     } catch (err) {
-      setError(err?.response?.data?.message || 'Failed to post job');
+      console.error("Job post/update error:", err);
+      setError(err?.response?.data?.message || 'Failed to save job');
     } finally {
       setLoading(false);
     }
@@ -59,8 +102,8 @@ const JobPost = () => {
   return (
     <DashboardLayout
       role="EMPLOYER"
-      title="Post a New Opportunity"
-      description="Create a compelling job listing to attract the best talent."
+      title={id ? "Edit Job Opportunity" : "Post a New Opportunity"}
+      description={id ? "Update your job listing details to keep them accurate." : "Create a compelling job listing to attract the best talent."}
     >
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -222,12 +265,12 @@ const JobPost = () => {
               {loading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Publishing...</span>
+                  <span>{id ? 'Updating...' : 'Publishing...'}</span>
                 </>
               ) : (
                 <>
                   <Briefcase className="w-5 h-5" />
-                  <span>Publish Job Listing</span>
+                  <span>{id ? 'Update Job Listing' : 'Publish Job Listing'}</span>
                 </>
               )}
             </button>
