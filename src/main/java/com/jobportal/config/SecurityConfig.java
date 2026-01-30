@@ -35,6 +35,9 @@ public class SecurityConfig {
 	@Autowired
 	private UserDetailsService userDetailsService;
 
+    @Autowired
+    private RateLimitFilter rateLimitFilter;
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -58,7 +61,6 @@ public class SecurityConfig {
 		http.csrf(csrf -> csrf.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.authorizeHttpRequests(auth -> auth
-				// Public authentication endpoints
 				.requestMatchers(
 					"/api/auth/register",
 					"/api/auth/login",
@@ -67,50 +69,32 @@ public class SecurityConfig {
 					"/api/auth/request-password-reset",
 					"/api/auth/reset-password"
 				).permitAll()
-				
-				// Job endpoints - read-only public, write operations protected
 				.requestMatchers(HttpMethod.GET, "/api/jobs/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/jobs/**").hasRole("EMPLOYER")
 				.requestMatchers(HttpMethod.PUT, "/api/jobs/**").hasRole("EMPLOYER")
 				.requestMatchers(HttpMethod.DELETE, "/api/jobs/**").hasRole("EMPLOYER")
-				
-				// Company endpoints - read public, write protected
 				.requestMatchers(HttpMethod.GET, "/api/company/**").permitAll()
 				.requestMatchers(HttpMethod.POST, "/api/company/**").hasRole("EMPLOYER")
 				.requestMatchers(HttpMethod.PUT, "/api/company/**").hasRole("EMPLOYER")
 				.requestMatchers(HttpMethod.DELETE, "/api/company/**").hasRole("EMPLOYER")
-				
-				// Application endpoints - all require authentication
 				.requestMatchers("/api/applications/**").authenticated()
-				
-				// Resume endpoints - all require authentication
 				.requestMatchers("/api/resumes/**").authenticated()
-				
-				// Notification endpoints - all require authentication
 				.requestMatchers("/api/notifications/**").authenticated()
-				
-				// Saved jobs endpoints - all require authentication
 				.requestMatchers("/api/saved-jobs/**").authenticated()
-				
-				// User profile endpoints - all require authentication
 				.requestMatchers("/api/users/**").authenticated()
-				
-				// Admin endpoints - admin only
+				.requestMatchers("/api/chat/**").authenticated()
 				.requestMatchers("/api/admin/**").hasRole("ADMIN")
-				
-				// Swagger/OpenAPI documentation - public in development
 				.requestMatchers(
 					"/v3/api-docs/**",
 					"/swagger-ui/**",
 					"/swagger-ui.html"
 				).permitAll()
-				
-				// All other endpoints require authentication
 				.anyRequest().authenticated()
 			)
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.authenticationProvider(authenticationProvider())
-			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}

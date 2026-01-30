@@ -33,6 +33,9 @@ public class ResumeServiceImpl implements ResumeService {
 	@Value("${app.upload.directory:uploads/resumes}")
 	private String uploadDirectory;
 
+	@Autowired
+	private EmbeddingService embeddingService;
+
 	@Override
 	public Resume uploadResume(MultipartFile file, String filename, Boolean isDefault, User user) {
 		try {
@@ -46,6 +49,18 @@ public class ResumeServiceImpl implements ResumeService {
 			Path filePath = uploadPath.resolve(filename);
 			Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 			
+			// Extract text if PDF
+			String extractedText = "";
+			if ("pdf".equalsIgnoreCase(getFileExtension(file.getOriginalFilename()))) {
+				extractedText = extractTextFromPdf(file);
+			}
+
+			// Generate embedding
+			List<Double> embedding = null;
+			if (!extractedText.isEmpty()) {
+				embedding = embeddingService.generateEmbedding(extractedText);
+			}
+
 			// Create resume entity
 			Resume resume = new Resume();
 			resume.setUserId(user);
@@ -54,6 +69,8 @@ public class ResumeServiceImpl implements ResumeService {
 			resume.setFileSize(file.getSize());
 			resume.setFileType(getFileExtension(file.getOriginalFilename()));
 			resume.setUploadedAt(LocalDateTime.now());
+			resume.setText(extractedText);
+			resume.setEmbedding(embedding);
 			
 			// If this is the first resume, set as default
 			if (resumeRepository.countByUserId(user) == 0) {
@@ -72,12 +89,22 @@ public class ResumeServiceImpl implements ResumeService {
 			}
 			
 			Resume saved = resumeRepository.save(resume);
-			log.info("Resume uploaded successfully for user: {} - File: {}", user.getEmail(), filename);
+			log.info("Resume uploaded and embedded successfully for user: {} - File: {}", user.getEmail(), filename);
 			return saved;
 			
 		} catch (IOException e) {
 			log.error("Failed to upload resume for user: {} - Error: {}", user.getEmail(), e.getMessage());
 			throw new JobPortalException("Failed to upload resume: " + e.getMessage());
+		}
+	}
+
+	private String extractTextFromPdf(MultipartFile file) {
+		try (org.apache.pdfbox.pdmodel.PDDocument document = org.apache.pdfbox.pdmodel.PDDocument.load(file.getInputStream())) {
+			org.apache.pdfbox.text.PDFTextStripper stripper = new org.apache.pdfbox.text.PDFTextStripper();
+			return stripper.getText(document);
+		} catch (IOException e) {
+			log.error("Failed to extract text from PDF: {}", e.getMessage());
+			return "";
 		}
 	}
 

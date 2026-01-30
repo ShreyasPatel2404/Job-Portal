@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: job-portal-mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: job-portal-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # Command to pull llama3 on startup
+    entrypoint: /bin/sh
+    command: -c "ollama serve & sleep 10 && ollama pull llama3 && ollama pull nomic-embed-text && wait"
+
+  backend:
+    build: .
+    container_name: job-portal-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - MONGODB_URI=mongodb://mongodb:27017/jobportal
+      - OLLAMA_BASE_URL=http://ollama:11434
+      - JWT_SECRET=${JWT_SECRET:-404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    depends_on:
+      - mongodb
+      - ollama
+
+volumes:
+  mongodb_data:
+  ollama_data:

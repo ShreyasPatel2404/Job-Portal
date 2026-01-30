@@ -1,6 +1,7 @@
 import React from 'react';
 import { Sidebar } from './Sidebar';
 import { motion } from 'framer-motion';
+import ChatWindow from '../chat/ChatWindow';
 import {
   LayoutDashboard,
   Users,
@@ -79,6 +80,7 @@ export const DashboardLayout = ({ role, title, description, children }) => {
           </div>
         </motion.main>
       </div>
+      <ChatWindow />
     </div>
   );
 };

@@ -40,6 +40,8 @@ public class Resume {
 	private LocalDateTime uploadedAt;
 	
 	// AI-extracted data (optional)
+	private String text;
+	private List<Double> embedding;
 	private ParsedData parsedData;
 	
 	@Data

@@ -23,6 +23,9 @@ public class JobServiceImpl implements JobService {
 	@Autowired
 	private JobRepository jobRepository;
 
+	@Autowired
+	private EmbeddingService embeddingService;
+
 	@Override
 	public JobDTO createJob(JobDTO jobDTO, User recruiter) {
 		Job job = new Job();
@@ -49,6 +52,10 @@ public class JobServiceImpl implements JobService {
 		job.setViews(0);
 		job.setCreatedAt(LocalDateTime.now());
 		job.setUpdatedAt(LocalDateTime.now());
+		
+		// Generate embedding for job search/match
+		String jobText = job.getTitle() + " " + job.getDescription() + " " + (job.getSkills() != null ? String.join(" ", job.getSkills()) : "");
+		job.setEmbedding(embeddingService.generateEmbedding(jobText));
 		
 		job = jobRepository.save(job);
 		return convertToDTO(job);
@@ -83,6 +90,10 @@ public class JobServiceImpl implements JobService {
 		job.setApplicationDeadline(jobDTO.getApplicationDeadline());
 		job.setIsFeatured(jobDTO.getIsFeatured());
 		job.setUpdatedAt(LocalDateTime.now());
+		
+		// Regenerate embedding on update
+		String jobText = job.getTitle() + " " + job.getDescription() + " " + (job.getSkills() != null ? String.join(" ", job.getSkills()) : "");
+		job.setEmbedding(embeddingService.generateEmbedding(jobText));
 		
 		job = jobRepository.save(job);
 		return convertToDTO(job);

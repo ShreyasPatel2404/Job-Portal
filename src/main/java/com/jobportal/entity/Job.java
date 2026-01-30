@@ -78,5 +78,7 @@ public class Job {
 	
 	@LastModifiedDate
 	private LocalDateTime updatedAt;
+
+	private List<Double> embedding;
 }
 

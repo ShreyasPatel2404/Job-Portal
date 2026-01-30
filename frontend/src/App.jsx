@@ -11,6 +11,7 @@ import EmployerApplications from './pages/dashboard/EmployerApplications';
 import Applications from './pages/Applications';
 import JobPost from './pages/JobPost';
 import EmployerJobs from './pages/dashboard/EmployerJobs';
+import JobMatch from './components/jobs/JobMatch';
 
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import EmployerDashboard from './pages/dashboard/EmployerDashboard';
@@ -50,6 +51,14 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/jobs" element={<Jobs />} />
               <Route path="/jobs/:id" element={<JobDetails />} />
+              <Route
+                path="/jobs/match"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <JobMatch />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/verify-email" element={<VerifyEmail />} />
               <Route path="/forgot-password" element={<RequestPasswordReset />} />
               <Route path="/reset-password" element={<ResetPassword />} />

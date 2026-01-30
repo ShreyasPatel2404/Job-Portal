@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: Job-Portal
+  data:
+    mongodb:
+      uri: ${MONGODB_URI:mongodb://localhost:27017/jobportal}
+      auto-index-creation: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: patelshreyas737@gmail.com
+    password: ${SPRING_MAIL_PASSWORD:vggjxscslzqytkoh}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      chat:
+        options:
+          model: llama3
+          temperature: 0.2
+      embedding:
+        options:
+          model: nomic-embed-text
+
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: 3600000
+
+app:
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
+  email:
+    verification:
+      expiry: 24
+  password:
+    reset:
+      expiry: 1
+  upload:
+    max-file-size: 5242880
+    allowed-types: application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document
+  security:
+    password:
+      min-length: 8
+      require-uppercase: true
+      require-lowercase: true
+      require-digit: true
+      require-special: true
+
+cors:
+  allowed:
+    origins: http://localhost:3000,http://localhost:3001

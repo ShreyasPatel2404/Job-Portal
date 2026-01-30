@@ -1,6 +1,7 @@
 import React from 'react';
 import { TopNav } from './TopNav';
 import { Footer } from './Footer';
+import ChatWindow from '../chat/ChatWindow';
 
 export const MainLayout = ({ children }) => {
     return (
@@ -9,6 +10,7 @@ export const MainLayout = ({ children }) => {
             <main className="flex-1">{children}</main>
             {/* Footer can go here */}
             <Footer />
+            <ChatWindow />
         </div>
     );
 };
