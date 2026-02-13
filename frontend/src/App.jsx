@@ -11,6 +11,9 @@ import EmployerApplications from './pages/dashboard/EmployerApplications';
 import Applications from './pages/Applications';
 import JobPost from './pages/JobPost';
 import EmployerJobs from './pages/dashboard/EmployerJobs';
+import ResumeDatabase from './pages/dashboard/ResumeDatabase'; // NEW
+import InterviewScheduler from './pages/dashboard/InterviewScheduler'; // NEW
+import Profile from './pages/Profile'; // NEW
 import JobMatch from './components/jobs/JobMatch';
 
 import AdminDashboard from './pages/dashboard/AdminDashboard';
@@ -86,6 +89,16 @@ function App() {
                 }
               />
 
+              {/* Profile Route (all authenticated users) */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Job Seeker Resume Management Route */}
               <Route
                 path="/dashboard/jobseeker/resumes"
@@ -96,12 +109,32 @@ function App() {
                 }
               />
 
+              {/* Recruiter Resume Database Route */}
+              <Route
+                path="/dashboard/resumes"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <ResumeDatabase />
+                  </ProtectedRoute>
+                }
+              />
+
               {/* Employer Applications Management Route */}
               <Route
                 path="/dashboard/recruiter/applications"
                 element={
                   <ProtectedRoute allowedRoles={['EMPLOYER']}>
                     <EmployerApplications />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Recruiter Interview Scheduler Route */}
+              <Route
+                path="/dashboard/recruiter/interviews"
+                element={
+                  <ProtectedRoute allowedRoles={['EMPLOYER']}>
+                    <InterviewScheduler />
                   </ProtectedRoute>
                 }
               />

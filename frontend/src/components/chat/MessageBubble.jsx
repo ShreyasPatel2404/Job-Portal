@@ -120,26 +120,68 @@ const MessageBubble = ({ message }) => {
                         </div>
                     </div>
                 );
-            case 'CANDIDATE_SEARCH':
+            case 'RESUME_ADVICE':
+                return (
+                    <div className="mt-3 space-y-3">
+                        {message.summaryFeedback && (
+                            <div className="p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-900">
+                                <strong>Feedback:</strong> {message.summaryFeedback}
+                            </div>
+                        )}
+                        {message.missingSkills && message.missingSkills.length > 0 && (
+                            <div className="p-3 bg-red-50 rounded-lg border border-red-100 text-sm">
+                                <strong className="text-red-700 block mb-1">Missing Skills:</strong>
+                                <div className="flex flex-wrap gap-2">
+                                    {message.missingSkills.map((skill, idx) => (
+                                        <span key={idx} className="px-2 py-0.5 bg-red-100 text-red-700 rounded text-xs border border-red-200">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {message.formattingAdvice && (
+                            <div className="p-3 bg-blue-50 rounded-lg border border-blue-100 text-sm text-blue-900">
+                                <strong>Formatting:</strong> {message.formattingAdvice}
+                            </div>
+                        )}
+                    </div>
+                );
+            case 'CAREER_GUIDANCE':
+                return (
+                    <div className="mt-3 p-3 bg-orange-50 rounded-lg border border-orange-100 text-sm text-orange-900 whitespace-pre-wrap">
+                        <strong>Roadmap:</strong>
+                        <div className="mt-1">{message.roadmap}</div>
+                    </div>
+                );
+            case 'INTERVIEW_QUESTIONS':
                 return (
                     <div className="mt-3 space-y-2">
-                        {message.data.map((candidate, idx) => (
-                            <div key={idx} className="p-3 bg-white/50 rounded border border-green-100 text-sm">
-                                <div className="font-semibold text-green-700">{candidate.name}</div>
-                                <div className="text-gray-600">{candidate.skills?.slice(0, 3).join(', ')}...</div>
-                                <div className="text-xs text-green-500 mt-1 cursor-pointer hover:underline">View Profile</div>
+                        {message.data.map((q, idx) => (
+                            <div key={idx} className="p-3 bg-white/50 rounded border border-green-100">
+                                <div className="font-medium text-green-900 text-sm">{q.question || q}</div>
+                                {q.type && (
+                                    <div className="flex gap-2 mt-1">
+                                        <span className="text-[10px] px-2 py-0.5 bg-green-100 text-green-700 rounded-full">{q.type}</span>
+                                        <span className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">{q.difficulty}</span>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>
                 );
-            case 'INTERVIEW_QUESTIONS':
             case 'SKILL_RECOMMENDATION':
                 return (
-                    <ul className="mt-2 space-y-1 list-disc list-inside text-sm">
-                        {message.data.map((item, idx) => (
-                            <li key={idx} className="text-gray-700">{item}</li>
-                        ))}
-                    </ul>
+                    <div className="mt-3 p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                        <strong className="text-yellow-800 text-xs uppercase mb-2 block">Recommended Skills</strong>
+                        <div className="flex flex-wrap gap-2">
+                            {message.data.map((skill, idx) => (
+                                <span key={idx} className="px-2 py-1 bg-white text-yellow-700 rounded-md text-xs border border-yellow-200 shadow-sm">
+                                    {skill}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
                 );
             default:
                 return null;

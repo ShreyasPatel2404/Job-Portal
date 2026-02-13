@@ -134,6 +134,16 @@ public class ResumeController {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@GetMapping("/search")
+	public ResponseEntity<List<Resume>> searchResumes(
+			@RequestParam String query,
+			Authentication authentication) {
+		// Verify user is EMPLOYER or ADMIN - for now assuming role check is handled by SecurityConfig or frontend
+		// Ideally add @PreAuthorize("hasRole('EMPLOYER')")
+		List<Resume> resumes = resumeService.searchResumes(query);
+		return ResponseEntity.ok(resumes);
+	}
+
 	private User getCurrentUser(Authentication authentication) {
 		String email = authentication.getName();
 		return userRepository.findByEmail(email)

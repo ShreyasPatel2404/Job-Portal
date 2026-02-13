@@ -25,4 +25,8 @@ export const resumeService = {
     const response = await api.delete(`/resumes/${id}`);
     return response.data;
   },
+  searchResumes: async (query) => {
+    const response = await api.get(`/resumes/search`, { params: { query } });
+    return response.data;
+  },
 };

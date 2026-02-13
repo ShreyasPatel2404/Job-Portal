@@ -17,4 +17,11 @@ public class ChatResponse {
     private String message;
     private List<?> data; // Jobs, questions, etc.
     private Map<String, Object> metadata;
+
+    // Structured Advice Fields (Resume/Career)
+    private String summaryFeedback;
+    private List<String> missingSkills;
+    private String formattingAdvice;
+    private String roadmap;
+
 }

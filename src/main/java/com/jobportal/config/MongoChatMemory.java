@@ -3,7 +3,6 @@ package com.jobportal.config;
 import com.jobportal.entity.ChatLog;
 import com.jobportal.repository.ChatLogRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
 import org.springframework.ai.chat.messages.UserMessage;
@@ -16,11 +15,10 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class MongoChatMemory implements ChatMemory {
+public class MongoChatMemory {
 
     private final ChatLogRepository chatLogRepository;
 
-    @Override
     public void add(String conversationId, Message message) {
         // We use userId as conversationId
         // The actual persistence is handled in ChatService.saveChatLog for now 
@@ -28,7 +26,6 @@ public class MongoChatMemory implements ChatMemory {
         // However, this interface is required by Spring AI.
     }
 
-    @Override
     public List<Message> get(String conversationId, int lastN) {
         List<ChatLog> logs = chatLogRepository.findByUserIdOrderByCreatedAtDesc(conversationId);
         
@@ -43,7 +40,6 @@ public class MongoChatMemory implements ChatMemory {
                 .collect(Collectors.toList());
     }
 
-    @Override
     public void clear(String conversationId) {
         // Optionally clear history
     }

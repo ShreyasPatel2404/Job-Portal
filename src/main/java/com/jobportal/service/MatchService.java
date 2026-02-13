@@ -39,13 +39,13 @@ public class MatchService {
                     double similarity = CosineSimilarityUtil.calculate(resume.getEmbedding(), job.getEmbedding());
                     double score = Math.round(similarity * 10000.0) / 100.0;
                     
-                    return Map.of(
-                            "jobId", job.getId(),
-                            "title", job.getTitle(),
-                            "company", job.getCompany(),
-                            "location", job.getLocation(),
-                            "matchScore", score
-                    );
+                    Map<String, Object> map = new java.util.HashMap<>();
+                    map.put("jobId", job.getId());
+                    map.put("title", job.getTitle());
+                    map.put("company", job.getCompany());
+                    map.put("location", job.getLocation());
+                    map.put("matchScore", score);
+                    return map;
                 })
                 .sorted((a, b) -> Double.compare((double) b.get("matchScore"), (double) a.get("matchScore")))
                 .limit(10)

@@ -13,6 +13,7 @@ public interface ResumeService {
 	Resume setAsDefault(String resumeId, User user);
 	Resume getDefaultResume(User user);
 	void deleteResume(String resumeId, User user);
+	List<Resume> searchResumes(String query);
 
 
 }

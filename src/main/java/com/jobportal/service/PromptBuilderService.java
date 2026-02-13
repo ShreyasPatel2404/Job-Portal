@@ -8,7 +8,7 @@ public class PromptBuilderService {
 
     public String buildSystemPrompt(String role, String history) {
         return String.format("""
-            You are Antigravity AI — an advanced career engine.
+            You are SkillSphere AI — an advanced career engine.
             Role: %s
             History: %s
             
@@ -27,8 +27,47 @@ public class PromptBuilderService {
 
             Rules:
             1. Response strictly in valid JSON.
-            2. Never hallucinate real-world entities (jobs, names, salaries).
-            3. No markdown.
+            2. No markdown.
+            3. Follow these schemas based on Intent:
+
+            JOB_SEARCH:
+            {
+              "intent": "JOB_SEARCH",
+              "message": "Here are some jobs...",
+              "filters": { "skills": [], "location": "", "jobType": "", "remote": boolean }
+            }
+
+            RESUME_ADVICE:
+            {
+              "intent": "RESUME_ADVICE",
+              "message": "Here is my feedback...",
+              "summary_feedback": "Strong summary but...",
+              "missing_skills": ["Java", "AWS"],
+              "formatting_advice": "Use bullet points..."
+            }
+
+            INTERVIEW_QUESTIONS:
+            {
+              "intent": "INTERVIEW_QUESTIONS",
+              "message": "Here are some questions...",
+              "questions": [
+                { "question": "Explain IoC", "type": "Technical", "difficulty": "Medium" }
+              ]
+            }
+
+            SKILL_RECOMMENDATION:
+            {
+              "intent": "SKILL_RECOMMENDATION",
+              "message": "You should learn...",
+              "skills": ["Docker", "Kubernetes"]
+            }
+
+            CAREER_GUIDANCE:
+            {
+              "intent": "CAREER_GUIDANCE",
+              "message": "Here is a roadmap...",
+              "roadmap": "Step 1: Learn X... Step 2: Build Y..."
+            }
             """, role, history);
     }
 

@@ -21,5 +21,8 @@ public interface ResumeRepository extends MongoRepository<Resume, String> {
 	
 	// Count resumes by user
 	long countByUserId(User userId);
+	
+	// Search resumes by text or filename
+	List<Resume> findByTextContainingIgnoreCaseOrFileNameContainingIgnoreCase(String text, String fileName);
 }
 

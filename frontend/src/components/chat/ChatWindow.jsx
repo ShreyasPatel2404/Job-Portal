@@ -10,7 +10,7 @@ const ChatWindow = () => {
     const [messages, setMessages] = useState([
         {
             sender: 'ai',
-            text: "Hello! I'm Antigravity AI. How can I accelerate your career today?",
+            text: "Hello! I'm SkillSphere AI. How can I accelerate your career today?",
             intent: 'CAREER_GUIDANCE'
         }
     ]);
@@ -65,7 +65,7 @@ const ChatWindow = () => {
                 <MessageSquare className="w-6 h-6" />
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border-2 border-white animate-pulse" />
                 <span className="absolute right-16 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    Talk to Antigravity AI
+                    Talk to SkillSphere AI
                 </span>
             </button>
         );
@@ -80,7 +80,7 @@ const ChatWindow = () => {
                         <Sparkles className="w-5 h-5" />
                     </div>
                     <div>
-                        <h3 className="font-bold text-sm">Antigravity AI</h3>
+                        <h3 className="font-bold text-sm">SkillSphere AI</h3>
                         <p className="text-[10px] text-blue-100 uppercase tracking-widest">Career Strategy Engine</p>
                     </div>
                 </div>
@@ -105,7 +105,7 @@ const ChatWindow = () => {
                             <div className="flex justify-start">
                                 <div className="bg-white p-3 rounded-2xl rounded-tl-none border border-blue-50 flex items-center gap-2 shadow-sm">
                                     <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
-                                    <span className="text-xs text-gray-500">Antigravity is thinking...</span>
+                                    <span className="text-xs text-gray-500">SkillSphere is thinking...</span>
                                 </div>
                             </div>
                         )}

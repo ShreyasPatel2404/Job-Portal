@@ -12,13 +12,13 @@ import com.jobportal.util.JSONValidatorUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.ChatClient;
-import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.UserMessage;
 import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.ai.chat.prompt.SystemPromptTemplate;
 import org.springframework.ai.ollama.api.OllamaOptions;
 import org.springframework.stereotype.Service;
+import com.jobportal.config.MongoChatMemory;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -33,7 +33,7 @@ public class ChatService {
     private final ResumeRepository resumeRepository;
     private final ChatLogRepository chatLogRepository;
     private final EmbeddingService embeddingService;
-    private final ChatMemory chatMemory;
+    private final MongoChatMemory chatMemory;
     private final ObjectMapper objectMapper;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
@@ -114,6 +114,11 @@ public class ChatService {
         
         if (rootNode.has("questions")) response.setData(objectMapper.convertValue(rootNode.get("questions"), List.class));
         if (rootNode.has("skills")) response.setData(objectMapper.convertValue(rootNode.get("skills"), List.class));
+        if (rootNode.has("missing_skills")) response.setMissingSkills(objectMapper.convertValue(rootNode.get("missing_skills"), List.class));
+        
+        if (rootNode.has("summary_feedback")) response.setSummaryFeedback(rootNode.path("summary_feedback").asText());
+        if (rootNode.has("formatting_advice")) response.setFormattingAdvice(rootNode.path("formatting_advice").asText());
+        if (rootNode.has("roadmap")) response.setRoadmap(rootNode.path("roadmap").asText());
 
         return response;
     }
@@ -127,8 +132,28 @@ public class ChatService {
             case JOB_TREND_ANALYSIS -> handleJobTrend(response);
             case SALARY_INSIGHT -> handleSalaryInsight(response);
             case APPLICATION_HELP -> handleApplicationHelp(response, user);
+            case RESUME_ADVICE -> handleResumeAdvice(response, user);
+            case INTERVIEW_QUESTIONS -> handleInterviewQuestions(response);
+            case SKILL_RECOMMENDATION -> handleSkillRecommendation(response);
+            case CAREER_GUIDANCE -> handleCareerGuidance(response);
             default -> {}
         }
+    }
+
+    private void handleResumeAdvice(ChatResponse response, User user) {
+        // Advice is already parsed into ChatResponse fields
+    }
+
+    private void handleInterviewQuestions(ChatResponse response) {
+        // Questions are already parsed into response.data
+    }
+
+    private void handleSkillRecommendation(ChatResponse response) {
+        // Skills are already parsed into response.data
+    }
+
+    private void handleCareerGuidance(ChatResponse response) {
+        // Roadmap is already parsed into response.roadmap
     }
 
     private void handleJobSearch(ChatResponse response) {
@@ -158,8 +183,8 @@ public class ChatService {
         Optional<Resume> resumeOpt = resumeRepository.findByUserIdAndIsDefaultTrue(user);
 
         if (jobOpt.isPresent() && resumeOpt.isPresent()) {
-            List<Double> jV = embeddingService.getEmbedding(jobOpt.get().getDescription());
-            List<Double> rV = embeddingService.getEmbedding(resumeOpt.get().getParsedData().toString());
+            List<Double> jV = embeddingService.generateEmbedding(jobOpt.get().getDescription());
+            List<Double> rV = embeddingService.generateEmbedding(resumeOpt.get().getParsedData().toString());
             double sim = CosineSimilarityUtil.calculate(jV, rV);
             
             Map<String, Object> match = new HashMap<>();

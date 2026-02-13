@@ -20,3 +20,4 @@ echo.
 echo 3. Starting Frontend (Vite)...
 cd frontend
 npm run dev
+@REM .\start_dev.bat

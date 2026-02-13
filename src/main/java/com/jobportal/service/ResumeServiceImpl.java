@@ -178,4 +178,9 @@ public class ResumeServiceImpl implements ResumeService {
 		}
 		return filename.substring(filename.lastIndexOf(".") + 1).toLowerCase();
 	}
+
+	@Override
+	public List<Resume> searchResumes(String query) {
+		return resumeRepository.findByTextContainingIgnoreCaseOrFileNameContainingIgnoreCase(query, query);
+	}
 }

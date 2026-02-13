@@ -98,7 +98,7 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.3.0</version>
 		</dependency>
-		<!-- Spring AI Dependencies -->
+			<!-- Spring AI Dependencies -->
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
 			<artifactId>spring-ai-ollama-spring-boot-starter</artifactId>
@@ -124,7 +124,7 @@
 			<dependency>
 				<groupId>org.springframework.ai</groupId>
 				<artifactId>spring-ai-bom</artifactId>
-				<version>0.8.1</version>
+				<version>0.8.0</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>

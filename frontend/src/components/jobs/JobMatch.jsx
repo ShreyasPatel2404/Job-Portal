@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Upload, Target, Loader2, CheckCircle, AlertCircle, Briefcase, MapPin } from 'lucide-react';
-import resumeService from '../../services/resumeService';
+import { resumeService } from '../../services/resumeService';
 import matchService from '../../services/matchService';
 
 const JobMatch = () => {
