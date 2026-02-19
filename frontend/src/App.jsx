@@ -16,6 +16,8 @@ import InterviewScheduler from './pages/dashboard/InterviewScheduler'; // NEW
 import Profile from './pages/Profile'; // NEW
 import JobMatch from './components/jobs/JobMatch';
 
+import ResumeBuilderPDF from './pages/dashboard/ResumeBuilderPDF';
+
 import AdminDashboard from './pages/dashboard/AdminDashboard';
 import EmployerDashboard from './pages/dashboard/EmployerDashboard';
 import JobSeekerDashboard from './pages/dashboard/JobSeekerDashboard';
@@ -105,6 +107,16 @@ function App() {
                 element={
                   <ProtectedRoute allowedRoles={['APPLICANT']}>
                     <ResumeManager />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Job Seeker Resume PDF Builder Route (not visible to recruiters) */}
+              <Route
+                path="/dashboard/jobseeker/resume-builder"
+                element={
+                  <ProtectedRoute allowedRoles={['APPLICANT']}>
+                    <ResumeBuilderPDF />
                   </ProtectedRoute>
                 }
               />

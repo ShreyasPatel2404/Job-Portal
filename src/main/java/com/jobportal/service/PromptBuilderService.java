@@ -68,6 +68,36 @@ public class PromptBuilderService {
               "message": "Here is a roadmap...",
               "roadmap": "Step 1: Learn X... Step 2: Build Y..."
             }
+
+            JOB_TREND_ANALYSIS:
+            {
+              "intent": "JOB_TREND_ANALYSIS",
+              "message": "Here are the top trending skills currently...",
+              "trends": ["Java", "React"]
+            }
+
+            SALARY_INSIGHT:
+            {
+              "intent": "SALARY_INSIGHT",
+              "message": "The salary range for Java Developers in NY is...",
+              "skill": "Java",
+              "location": "New York"
+            }
+
+            APPLICATION_HELP:
+            {
+              "intent": "APPLICATION_HELP",
+              "message": "I've analyzed your application status...",
+              "intel": { "totalApplications": 10, "pending": 5 } 
+            }
+
+            RESUME_JOB_MATCH:
+            {
+              "intent": "RESUME_JOB_MATCH",
+              "message": "Analyzing your fit for this role...",
+              "jobId": "12345 (if known)",
+              "jobTitle": "Java Developer (if ID unknown)"
+            }
             """, role, history);
     }
 

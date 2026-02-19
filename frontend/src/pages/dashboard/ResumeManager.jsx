@@ -72,17 +72,27 @@ const ResumeManager = () => {
       description="Manage your CVs and documents."
     >
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
             <FileText className="w-6 h-6 text-primary" />
             My Resumes
           </h2>
-          <button
-            onClick={() => setShowForm(!showForm)}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-sm"
-          >
-            {showForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Resume</>}
-          </button>
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => setShowForm(!showForm)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 text-sm"
+            >
+              {showForm ? 'Cancel' : <><Plus className="w-4 h-4" /> Add Resume</>}
+            </button>
+            {/* Only visible to jobseekers, not recruiters */}
+            <a
+              href="/dashboard/jobseeker/resume-builder"
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-400/20 text-sm"
+              style={{ textDecoration: 'none' }}
+            >
+              <FileText className="w-4 h-4" /> Generate Resume PDF
+            </a>
+          </div>
         </div>
 
         <AnimatePresence>

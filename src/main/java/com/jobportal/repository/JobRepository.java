@@ -52,5 +52,9 @@ public interface JobRepository extends MongoRepository<Job, String> {
 	
 	// Count active jobs
 	long countByStatus(String status);
+	
+	// Find jobs by title regex (for fuzzy matching)
+	@Query("{ title: { $regex: ?0, $options: 'i' }, status: 'active' }")
+	List<Job> findByTitleRegex(String titlePattern);
 }
 

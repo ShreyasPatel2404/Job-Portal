@@ -179,18 +179,58 @@ public class ChatService {
 
     private void handleResumeJobMatch(ChatResponse response, User user) {
         String jobId = (String) response.getMetadata().get("jobId");
-        Optional<Job> jobOpt = jobRepository.findById(jobId != null ? jobId : "");
+        Optional<Job> jobOpt = Optional.empty();
+
+        if (jobId != null && !jobId.isEmpty()) {
+            jobOpt = jobRepository.findById(jobId);
+        } else {
+             // Try to find a job by context or recent interaction? 
+             // For now, if no ID, maybe search by title if available in metadata?
+             // Or just use the most recent job the user applied to? 
+             // Let's assume the AI might extract a "jobTitle" filter or similar.
+             // If not, we can't do much without a specific job.
+             // Implementation enhancement:
+             String potentialTitle = (String) response.getMetadata().get("jobTitle");
+             if (potentialTitle != null) {
+                 List<Job> jobs = jobRepository.findByTitleRegex(potentialTitle); // Assuming this method exists or we use search
+                 if (!jobs.isEmpty()) jobOpt = Optional.of(jobs.get(0));
+             }
+        }
+
         Optional<Resume> resumeOpt = resumeRepository.findByUserIdAndIsDefaultTrue(user);
 
         if (jobOpt.isPresent() && resumeOpt.isPresent()) {
-            List<Double> jV = embeddingService.generateEmbedding(jobOpt.get().getDescription());
-            List<Double> rV = embeddingService.generateEmbedding(resumeOpt.get().getParsedData().toString());
-            double sim = CosineSimilarityUtil.calculate(jV, rV);
+            String jobDesc = jobOpt.get().getDescription() + " " + jobOpt.get().getTitle() + " " + String.join(" ", jobOpt.get().getSkills());
+            String resumeText = resumeOpt.get().getParsedData() != null ? resumeOpt.get().getParsedData().toString() : resumeOpt.get().getText();
             
-            Map<String, Object> match = new HashMap<>();
-            match.put("matchScore", (int)(sim * 100));
-            match.put("jobTitle", jobOpt.get().getTitle());
-            response.setData(List.of(match));
+            if (resumeText == null) resumeText = "";
+
+            List<Double> jV = embeddingService.generateEmbedding(jobDesc);
+            List<Double> rV = embeddingService.generateEmbedding(resumeText);
+            
+            if (jV != null && rV != null) {
+                double sim = CosineSimilarityUtil.calculate(jV, rV);
+                int score = (int) (Math.max(0, sim) * 100);
+                
+                Map<String, Object> match = new HashMap<>();
+                match.put("matchScore", score);
+                match.put("jobTitle", jobOpt.get().getTitle());
+                match.put("jobId", jobOpt.get().getId());
+                
+                // Add specific advice based on score
+                String advice = "";
+                if (score > 80) advice = "Excellent match! Your profile aligns well.";
+                else if (score > 60) advice = "Good match, but consider highlighting more relevant skills.";
+                else advice = "Low match. You might need to gain more experience or tailor your resume.";
+                
+                match.put("advice", advice);
+                response.setData(List.of(match));
+                response.setMessage(response.getMessage() + "\nMatch Analysis for " + jobOpt.get().getTitle() + ": " + advice);
+            } else {
+                response.setMessage("Unable to generate match analysis at this time.");
+            }
+        } else {
+            response.setMessage("Could not find a valid job or resume to compare. Please specify a job title or ensure you have a default resume.");
         }
     }
 
