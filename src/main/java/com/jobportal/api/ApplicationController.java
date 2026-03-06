@@ -1,7 +1,11 @@
+
+
+		// (Removed misplaced method definition before package declaration)
 package com.jobportal.api;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,13 +26,25 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import com.jobportal.dto.ApplicationDTO;
 import com.jobportal.entity.Job;
 import com.jobportal.entity.User;
+import com.jobportal.entity.Resume;
 import com.jobportal.repository.JobRepository;
 import com.jobportal.repository.UserRepository;
 import com.jobportal.service.ApplicationService;
+import com.jobportal.service.ResumeService;
 
 import jakarta.validation.Valid;
 
@@ -37,63 +53,141 @@ import jakarta.validation.Valid;
 @CrossOrigin(origins = "*")
 public class ApplicationController {
 	
+	private static final String UPLOAD_DIR = "uploads/resumes/";
+
+		// Get applications for a job (for recruiter dashboard)
+		@GetMapping("/job/{jobId}")
+		public ResponseEntity<Page<ApplicationDTO>> getApplicationsByJob(
+				@PathVariable String jobId,
+				@RequestParam(defaultValue = "0") int page,
+				@RequestParam(defaultValue = "10") int size,
+				Authentication authentication) {
+			User recruiter = getCurrentUser(authentication);
+			Job job = jobRepository.findById(jobId)
+					.orElseThrow(() -> new RuntimeException("Job not found"));
+			// Only allow recruiter who posted the job
+			if (!job.getPostedBy().getId().equals(recruiter.getId())) {
+				return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+			}
+			Pageable pageable = PageRequest.of(page, size);
+			Page<ApplicationDTO> applications = applicationService.getApplicationsByJob(job, pageable);
+			return ResponseEntity.ok(applications);
+		}
 	private static final Logger log = LoggerFactory.getLogger(ApplicationController.class);
-	
+
 	@Autowired
 	private ApplicationService applicationService;
-	
+
 	@Autowired
 	private UserRepository userRepository;
-	
+
 	@Autowired
 	private JobRepository jobRepository;
-	
+
+	@Autowired
+	private ResumeService resumeService;
+// ...existing methods...
+// (No duplicate class or misplaced imports)
+
+	// Existing JSON-based application endpoint (keep for reference)
 	@PostMapping("/job/{jobId}")
 	public ResponseEntity<ApplicationDTO> applyToJob(
 			@PathVariable String jobId,
 			@Valid @RequestBody ApplicationDTO applicationDTO,
 			Authentication authentication) {
-		
 		User applicant = getCurrentUser(authentication);
 		
-		// Verify user is APPLICANT
-		if (applicant.getAccountType() != com.jobportal.dto.AccountType.APPLICANT) {
-			log.warn("Non-applicant attempted to apply to job: {} - User: {}", jobId, applicant.getEmail());
-			throw new RuntimeException("Only job seekers can apply to jobs");
+		// Map the applicant's default resume if none provided in DTO
+		if (applicationDTO.getResumeUrl() == null || applicationDTO.getResumeUrl().isEmpty()) {
+			try {
+				Resume defaultResume = resumeService.getDefaultResume(applicant);
+				applicationDTO.setResumeFileName(defaultResume.getFileName());
+				
+				String url = defaultResume.getFileUrl();
+				if (url != null) {
+					String filename = Paths.get(url).getFileName().toString();
+					applicationDTO.setResumeUrl("/api/applications/download/" + filename);
+				}
+			} catch (Exception e) {
+				// No default resume found
+				throw new RuntimeException("No resume found. Please upload a resume in your profile before applying.");
+			}
 		}
-		
-		// Verify job exists and is active
-		Job job = jobRepository.findById(jobId)
-			.orElseThrow(() -> {
-				log.warn("Application attempt for non-existent job: {} by user: {}", jobId, applicant.getEmail());
-				return new RuntimeException("Job not found");
-			});
-		
-		if (!"active".equals(job.getStatus())) {
-			log.warn("Application attempt for inactive job: {} by user: {}", jobId, applicant.getEmail());
-			throw new RuntimeException("This job is no longer accepting applications");
-		}
-		
-		// Check application deadline
-		if (job.getApplicationDeadline() != null && 
-			job.getApplicationDeadline().isBefore(LocalDateTime.now())) {
-			log.warn("Application attempt after deadline for job: {} by user: {}", jobId, applicant.getEmail());
-			throw new RuntimeException("Application deadline has passed");
-		}
-		
-		log.info("Job application submitted: Job {} by user: {}", jobId, applicant.getEmail());
+
 		ApplicationDTO created = applicationService.applyToJob(jobId, applicationDTO, applicant);
 		return ResponseEntity.status(HttpStatus.CREATED).body(created);
 	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<ApplicationDTO> getApplicationById(@PathVariable String id) {
-		ApplicationDTO application = applicationService.getApplicationById(id);
-		return ResponseEntity.ok(application);
+
+	// New: File upload endpoint for job application
+	@PostMapping("/job/{jobId}/upload")
+	public ResponseEntity<ApplicationDTO> applyToJobWithFile(
+			@PathVariable String jobId,
+			@RequestParam("resume") MultipartFile resumeFile,
+			@RequestParam(value = "coverLetter", required = false) String coverLetter,
+			Authentication authentication) throws IOException {
+		User applicant = getCurrentUser(authentication);
+		if (applicant == null) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+		}
+		Job job = jobRepository.findById(jobId)
+				.orElseThrow(() -> new RuntimeException("Job not found"));
+		if (!"active".equals(job.getStatus())) {
+			throw new RuntimeException("This job is no longer accepting applications");
+		}
+		if (job.getApplicationDeadline() != null && job.getApplicationDeadline().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("Application deadline has passed");
+		}
+		// Save file to disk
+		Path uploadPath = Paths.get(UPLOAD_DIR);
+		if (!Files.exists(uploadPath)) {
+			Files.createDirectories(uploadPath);
+		}
+		String resumeFileName = resumeFile.getOriginalFilename();
+		String newFilename = System.currentTimeMillis() + "_" + resumeFileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+		Path filePath = uploadPath.resolve(newFilename);
+		Files.copy(resumeFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+		String resumeUrl = "/api/applications/download/" + newFilename;
+		
+		ApplicationDTO applicationDTO = new ApplicationDTO();
+		applicationDTO.setResumeFileName(resumeFileName);
+		applicationDTO.setResumeUrl(resumeUrl);
+		applicationDTO.setCoverLetter(coverLetter);
+		applicationDTO.setJobId(jobId);
+		applicationDTO.setApplicantId(applicant.getId());
+		ApplicationDTO created = applicationService.applyToJob(jobId, applicationDTO, applicant);
+		created.setResumeUrl(resumeUrl); // Ensure resumeUrl is set in response
+		return ResponseEntity.status(HttpStatus.CREATED).body(created);
 	}
 	
-	@GetMapping
-	public ResponseEntity<Page<ApplicationDTO>> getMyApplications(
+	// New: Endpoint to download resume
+	@GetMapping("/download/{filename}")
+	public ResponseEntity<Resource> downloadResume(@PathVariable String filename) {
+		try {
+			Path filePath = Paths.get(UPLOAD_DIR).resolve(filename).normalize();
+			Resource resource = new UrlResource(filePath.toUri());
+
+			if (resource.exists()) {
+				return ResponseEntity.ok()
+						.contentType(MediaType.parseMediaType("application/pdf"))
+						.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+						.body(resource);
+			} else {
+				String errorMsg = "The requested resume file (" + filename + ") could not be found on the server. " +
+								  "It may have been uploaded before the final file storage feature was implemented, or the file was deleted.";
+				return ResponseEntity.status(HttpStatus.NOT_FOUND)
+						.contentType(MediaType.TEXT_PLAIN)
+						.body(new org.springframework.core.io.ByteArrayResource(errorMsg.getBytes()));
+			}
+		} catch (Exception e) {
+			return ResponseEntity.internalServerError().build();
+		}
+	}
+	
+
+	// New: Paginated endpoint to get all applications for the current user
+	@GetMapping("")
+	public ResponseEntity<Page<ApplicationDTO>> getApplications(
 			@RequestParam(defaultValue = "0") int page,
 			@RequestParam(defaultValue = "10") int size,
 			Authentication authentication) {
@@ -102,29 +196,18 @@ public class ApplicationController {
 		Page<ApplicationDTO> applications = applicationService.getApplicationsByApplicant(applicant, pageable);
 		return ResponseEntity.ok(applications);
 	}
-	
-	@GetMapping("/job/{jobId}")
-	public ResponseEntity<Page<ApplicationDTO>> getJobApplications(
-			@PathVariable String jobId,
-			@RequestParam(defaultValue = "0") int page,
-			@RequestParam(defaultValue = "10") int size,
+
+	@GetMapping("/status/{status}")
+	public ResponseEntity<List<ApplicationDTO>> getApplicationsByStatus(
+			@PathVariable String status,
 			Authentication authentication) {
-		User recruiter = getCurrentUser(authentication);
-		Job job = jobRepository.findById(jobId)
-				.orElseThrow(() -> new RuntimeException("Job not found"));
-		
-		// Verify recruiter owns the job
-		if (!job.getPostedBy().getId().equals(recruiter.getId())) {
-			throw new RuntimeException("You don't have permission to view these applications");
-		}
-		
-		Pageable pageable = PageRequest.of(page, size);
-		Page<ApplicationDTO> applications = applicationService.getApplicationsByJob(job, pageable);
+		User applicant = getCurrentUser(authentication);
+		List<ApplicationDTO> applications = applicationService.getApplicationsByStatus(applicant, status);
 		return ResponseEntity.ok(applications);
 	}
 	
 	@PutMapping("/{id}/status")
-	public ResponseEntity<ApplicationDTO> updateApplicationStatus(
+	public ResponseEntity<ApplicationDTO> updateStatus(
 			@PathVariable String id,
 			@RequestParam String status,
 			@RequestParam(required = false) String notes,
@@ -135,25 +218,8 @@ public class ApplicationController {
 		return ResponseEntity.ok(updated);
 	}
 	
-	@DeleteMapping("/{id}")
-	public ResponseEntity<Void> withdrawApplication(
-			@PathVariable String id,
-			Authentication authentication) {
-		User applicant = getCurrentUser(authentication);
-		applicationService.withdrawApplication(id, applicant);
-		return ResponseEntity.noContent().build();
-	}
-	
-	@GetMapping("/status/{status}")
-	public ResponseEntity<List<ApplicationDTO>> getApplicationsByStatus(
-			@PathVariable String status,
-			Authentication authentication) {
-		User applicant = getCurrentUser(authentication);
-		List<ApplicationDTO> applications = applicationService.getApplicationsByStatus(applicant, status);
-		return ResponseEntity.ok(applications);
-	}
-	
 	private User getCurrentUser(Authentication authentication) {
+
 		String email = authentication.getName();
 		return userRepository.findByEmail(email)
 				.orElseThrow(() -> new RuntimeException("User not found"));

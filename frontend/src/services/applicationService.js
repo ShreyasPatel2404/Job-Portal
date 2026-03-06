@@ -6,6 +6,11 @@ export const applicationService = {
     return response.data;
   },
 
+  applyToJobWithFile: async (jobId, formData) => {
+    const response = await api.post(`/applications/job/${jobId}/upload`, formData);
+    return response.data;
+  },
+
   getMyApplications: async (page = 0, size = 10) => {
     const params = new URLSearchParams({
       page: page.toString(),

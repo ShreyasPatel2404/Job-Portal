@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { DashboardLayout } from '../../components/layout/DashboardLayout';
+
 import { jobService } from '../../services/jobService';
 import { applicationService } from '../../services/applicationService';
 import { Badge } from '../../components/ui/badge';
+import ApplicationDetailsModal from '../../components/ApplicationDetailsModal';
 import { useToast } from '../../components/common/ToastContainer.jsx';
+
 import { motion, AnimatePresence } from 'framer-motion';
 import { Users, FileText, Filter, CheckCircle, XCircle, Clock, ChevronLeft, ChevronRight, Briefcase } from 'lucide-react';
 
@@ -16,7 +20,12 @@ const EmployerApplications = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [statusUpdating, setStatusUpdating] = useState('');
+  const [selectedApplication, setSelectedApplication] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { show } = useToast();
+  const navigate = useNavigate();
+
+
 
   useEffect(() => {
     fetchMyJobs();
@@ -61,11 +70,19 @@ const EmployerApplications = () => {
         title: 'Status updated',
         description:
           newStatus === 'ACCEPTED'
-            ? 'Candidate moved forward in your pipeline.'
+            ? 'Candidate accepted! Redirecting to schedule interview...'
             : 'Candidate has been rejected for this role.',
       });
       fetchApplications(selectedJobId, page);
+      setIsModalOpen(false);
+
+      if (newStatus === 'ACCEPTED') {
+        setTimeout(() => {
+          navigate('/dashboard/recruiter/interviews');
+        }, 1500); // Small delay to allow toast to be seen
+      }
     } catch {
+
       show({
         variant: 'error',
         title: 'Update failed',
@@ -174,16 +191,18 @@ const EmployerApplications = () => {
                               </div>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <a
-                                href={app.resumeUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
+                              <button
+                                onClick={() => {
+                                  setSelectedApplication(app);
+                                  setIsModalOpen(true);
+                                }}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
                               >
                                 <FileText className="w-3.5 h-3.5" />
-                                View Resume
-                              </a>
+                                View Details
+                              </button>
                             </td>
+
                             <td className="px-6 py-4">
                               <div className="max-w-xs truncate text-sm text-gray-600 dark:text-gray-300" title={app.coverLetter}>
                                 {app.coverLetter || <span className="text-gray-400 italic">No cover letter</span>}
@@ -192,43 +211,43 @@ const EmployerApplications = () => {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <Badge
                                 variant={
-                                  app.status === 'ACCEPTED'
+                                  app.status?.toUpperCase() === 'ACCEPTED'
                                     ? 'success'
-                                    : app.status === 'REJECTED'
+                                    : app.status?.toUpperCase() === 'REJECTED'
                                       ? 'destructive'
                                       : 'secondary'
                                 }
                                 className="capitalize"
                               >
-                                {app.status.toLowerCase()}
+                                {app.status?.toLowerCase()}
                               </Badge>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                               {app.appliedAt ? new Date(app.appliedAt).toLocaleDateString() : '-'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              {app.status === 'PENDING' ? (
-                                <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-2">
+                                {app.status?.toUpperCase() !== 'ACCEPTED' && (
                                   <button
                                     disabled={statusUpdating === app.id + 'ACCEPTED'}
                                     onClick={() => handleStatusChange(app.id, 'ACCEPTED')}
-                                    className="p-1.5 rounded-lg text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-colors disabled:opacity-50"
-                                    title="Accept"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/10 dark:hover:bg-emerald-900/20 text-xs font-bold transition-colors disabled:opacity-50"
                                   >
-                                    <CheckCircle className="w-5 h-5" />
+                                    <CheckCircle className="w-4 h-4" />
+                                    Accept
                                   </button>
+                                )}
+                                {app.status?.toUpperCase() !== 'REJECTED' && (
                                   <button
                                     disabled={statusUpdating === app.id + 'REJECTED'}
                                     onClick={() => handleStatusChange(app.id, 'REJECTED')}
-                                    className="p-1.5 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors disabled:opacity-50"
-                                    title="Reject"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/10 dark:hover:bg-red-900/20 text-xs font-bold transition-colors disabled:opacity-50"
                                   >
-                                    <XCircle className="w-5 h-5" />
+                                    <XCircle className="w-4 h-4" />
+                                    Reject
                                   </button>
-                                </div>
-                              ) : (
-                                <span className="text-xs text-gray-400">Processed</span>
-                              )}
+                                )}
+                              </div>
                             </td>
                           </motion.tr>
                         ))}
@@ -266,7 +285,22 @@ const EmployerApplications = () => {
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {isModalOpen && (
+          <ApplicationDetailsModal
+            isOpen={isModalOpen}
+            application={selectedApplication}
+            onClose={() => setIsModalOpen(false)}
+            onStatusChange={(id, status) => {
+              handleStatusChange(id, status);
+            }}
+            isUpdating={!!statusUpdating}
+          />
+        )}
+      </AnimatePresence>
     </DashboardLayout>
+
   );
 };
 

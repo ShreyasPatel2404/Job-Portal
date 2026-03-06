@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import ApplyJobModal from '../components/ApplyJobModal';
 import { savedJobService } from '../services/savedJobService';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -7,9 +8,16 @@ import { DashboardLayout } from '../components/layout/DashboardLayout';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 
+
 const SavedJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showApplyModal, setShowApplyModal] = useState(false);
+  const [selectedJob, setSelectedJob] = useState(null);
+  const [resumeFile, setResumeFile] = useState(null);
+  const [coverLetter, setCoverLetter] = useState('');
+  const [applyError, setApplyError] = useState('');
+  const [applySuccess, setApplySuccess] = useState('');
 
   useEffect(() => {
     fetchSavedJobs();
@@ -19,7 +27,6 @@ const SavedJobs = () => {
     setLoading(true);
     try {
       const data = await savedJobService.getSavedJobs();
-      // Handle Spring Data Page structure (data.content)
       const savedJobsList = data.content || data;
       setJobs(Array.isArray(savedJobsList) ? savedJobsList : []);
     } catch (error) {
@@ -33,6 +40,48 @@ const SavedJobs = () => {
   const handleUnsave = async (jobId) => {
     await savedJobService.unsaveJob(jobId);
     setJobs(jobs.filter(job => job.jobId.id !== jobId));
+  };
+
+  const openApplyModal = (job) => {
+    setSelectedJob(job);
+    setResumeFile(null);
+    setCoverLetter('');
+    setApplyError('');
+    setApplySuccess('');
+    setShowApplyModal(true);
+  };
+
+  const closeApplyModal = () => {
+    setShowApplyModal(false);
+    setSelectedJob(null);
+    setResumeFile(null);
+    setCoverLetter('');
+    setApplyError('');
+    setApplySuccess('');
+  };
+
+  const handleResumeChange = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type !== 'application/pdf') {
+      setApplyError('Only PDF files are allowed.');
+      setResumeFile(null);
+    } else {
+      setApplyError('');
+      setResumeFile(file);
+    }
+  };
+
+  const handleApply = async (e) => {
+    e.preventDefault();
+    setApplyError('');
+    setApplySuccess('');
+    if (!resumeFile) {
+      setApplyError('Please upload your resume (PDF).');
+      return;
+    }
+    // TODO: Implement backend API for file upload
+    setApplySuccess('Application submitted (mock, backend integration needed).');
+    setTimeout(() => closeApplyModal(), 1200);
   };
 
   return (
@@ -101,13 +150,21 @@ const SavedJobs = () => {
                       </div>
                     </div>
 
-                    <Link
-                      to={`/jobs/${job.id}`}
-                      className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 text-sm font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
-                    >
-                      View Details
-                      <ArrowUpRight className="w-4 h-4" />
-                    </Link>
+                    <div className="flex gap-2 mt-2">
+                      <Link
+                        to={`/jobs/${job.id}`}
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-slate-200 bg-white dark:bg-zinc-900 dark:border-zinc-800 text-sm font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
+                      >
+                        View Details
+                        <ArrowUpRight className="w-4 h-4" />
+                      </Link>
+                      <button
+                        className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-primary bg-primary/10 text-primary font-medium hover:bg-primary hover:text-white hover:border-primary transition-all group-hover:shadow-md"
+                        onClick={() => openApplyModal(job)}
+                      >
+                        Apply
+                      </button>
+                    </div>
                   </motion.div>
                 );
               })}
@@ -135,6 +192,14 @@ const SavedJobs = () => {
               </Button>
             </Link>
           </motion.div>
+        )}
+
+        {/* Enhanced Apply Modal */}
+        {showApplyModal && selectedJob && (
+          <ApplyJobModal
+            job={selectedJob}
+            onClose={closeApplyModal}
+          />
         )}
       </div>
     </DashboardLayout>

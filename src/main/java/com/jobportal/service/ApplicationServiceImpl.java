@@ -15,6 +15,7 @@ import com.jobportal.dto.ApplicationDTO;
 import com.jobportal.entity.Application;
 import com.jobportal.entity.Job;
 import com.jobportal.entity.User;
+import com.jobportal.entity.Resume;
 import com.jobportal.repository.ApplicationRepository;
 import com.jobportal.repository.JobRepository;
 
@@ -26,6 +27,9 @@ public class ApplicationServiceImpl implements ApplicationService {
 	
 	@Autowired
 	private JobRepository jobRepository;
+
+	@Autowired
+	private ResumeService resumeService;
 
 	@Override
 	public ApplicationDTO applyToJob(String jobId, ApplicationDTO applicationDTO, User applicant) {
@@ -50,7 +54,7 @@ public class ApplicationServiceImpl implements ApplicationService {
 		application.setResumeUrl(applicationDTO.getResumeUrl());
 		application.setResumeFileName(applicationDTO.getResumeFileName());
 		application.setCoverLetter(applicationDTO.getCoverLetter());
-		application.setStatus("pending");
+		application.setStatus("PENDING");
 		application.setAppliedAt(LocalDateTime.now());
 		application.setUpdatedAt(LocalDateTime.now());
 		application.setMatchScore(applicationDTO.getMatchScore());
@@ -94,7 +98,8 @@ public class ApplicationServiceImpl implements ApplicationService {
 			   throw new JobPortalException("You don't have permission to update this application");
 		}
 		
-		application.setStatus(status);
+		// Normalize status to uppercase for consistent comparison on frontend
+		application.setStatus(status != null ? status.toUpperCase() : "PENDING");
 		application.setReviewedBy(recruiter);
 		application.setReviewedAt(LocalDateTime.now());
 		application.setUpdatedAt(LocalDateTime.now());
@@ -154,8 +159,29 @@ public class ApplicationServiceImpl implements ApplicationService {
 		dto.setCompanyName(application.getJobId().getCompany());
 		dto.setApplicantId(application.getApplicantId().getId());
 		dto.setApplicantName(application.getApplicantId().getName());
-		dto.setResumeUrl(application.getResumeUrl());
-		dto.setResumeFileName(application.getResumeFileName());
+		dto.setApplicantEmail(application.getApplicantId().getEmail());
+		
+		String resumeUrl = application.getResumeUrl();
+		String resumeFileName = application.getResumeFileName();
+		
+		if (resumeUrl == null || resumeUrl.isEmpty()) {
+			try {
+				Resume defaultResume = resumeService.getDefaultResume(application.getApplicantId());
+				if (defaultResume != null) {
+					resumeFileName = defaultResume.getFileName();
+					String url = defaultResume.getFileUrl();
+					if (url != null) {
+						String filename = java.nio.file.Paths.get(url).getFileName().toString();
+						resumeUrl = "/api/applications/download/" + filename;
+					}
+				}
+			} catch (Exception e) {
+				// ignore
+			}
+		}
+		
+		dto.setResumeUrl(resumeUrl);
+		dto.setResumeFileName(resumeFileName);
 		dto.setCoverLetter(application.getCoverLetter());
 		dto.setStatus(application.getStatus());
 		dto.setAppliedAt(application.getAppliedAt());

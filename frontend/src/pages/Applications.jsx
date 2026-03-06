@@ -62,6 +62,13 @@ const Applications = () => {
     }
   };
 
+  const getResumeUrl = (url) => {
+    if (!url) return '#';
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/api/applications/download/')) return url;
+    return `/api/applications/download/${url.split('/').pop()}`;
+  };
+
   return (
     <DashboardLayout
       role="APPLICANT"
@@ -122,15 +129,15 @@ const Applications = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2 text-sm text-foreground/80">
                           <Building2 className="w-4 h-4 text-muted-foreground" />
-                          {app.company}
+                          {app.companyName}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <Badge
                           variant={
-                            app.status === 'ACCEPTED' || app.status === 'hired'
+                            app.status?.toUpperCase() === 'ACCEPTED' || app.status?.toUpperCase() === 'HIRED'
                               ? 'success'
-                              : app.status === 'REJECTED' || app.status === 'rejected'
+                              : app.status?.toUpperCase() === 'REJECTED' || app.status?.toUpperCase() === 'REJECTED'
                                 ? 'destructive'
                                 : 'secondary'
                           }
@@ -138,6 +145,7 @@ const Applications = () => {
                         >
                           {app.status}
                         </Badge>
+
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -153,7 +161,7 @@ const Applications = () => {
                         <div className="flex items-center gap-4">
                           {app.resumeUrl && (
                             <a
-                              href={app.resumeUrl}
+                              href={getResumeUrl(app.resumeUrl)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="font-medium text-primary hover:text-primary/80 transition-colors text-xs border border-primary/20 px-3 py-1.5 rounded-md bg-primary/5 hover:bg-primary/10"

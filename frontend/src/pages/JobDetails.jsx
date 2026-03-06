@@ -177,68 +177,7 @@ const JobDetails = () => {
             )}
           </div>
 
-          {isAuthenticated && user?.accountType === 'APPLICANT' && (
-          <div className="mt-10 border-t border-gray-200 pt-8 dark:border-zinc-700">
-            <h2 className="mb-4 text-sm font-semibold text-zinc-900 dark:text-white">Apply for this job</h2>
-            {successMsg && (
-              <div className="mb-4 px-4 py-2 rounded bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200 shadow">
-                {successMsg}
-              </div>
-            )}
-            {errorMsg && (
-              <div className="mb-4 px-4 py-2 rounded bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 shadow">
-                {errorMsg}
-              </div>
-            )}
-            <form onSubmit={handleApply} className="space-y-4 text-xs">
-              <div>
-                <label
-                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
-                  htmlFor="resumeUrl"
-                >
-                  Resume URL <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="resumeUrl"
-                  type="url"
-                  required
-                  value={applicationData.resumeUrl}
-                  onChange={(e) => setApplicationData({ ...applicationData, resumeUrl: e.target.value })}
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  placeholder="https://your-resume-link.com"
-                  autoComplete="off"
-                />
-              </div>
-              <div>
-                <label
-                  className="mb-1 block text-xs font-medium text-zinc-700 dark:text-zinc-200"
-                  htmlFor="coverLetter"
-                >
-                  Cover letter <span className="text-[10px] text-gray-400">(optional)</span>
-                </label>
-                <textarea
-                  id="coverLetter"
-                  value={applicationData.coverLetter}
-                  onChange={(e) => setApplicationData({ ...applicationData, coverLetter: e.target.value })}
-                  className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-xs text-zinc-900 focus:ring-2 focus:ring-primary-400 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  rows="4"
-                  placeholder="Write your cover letter..."
-                />
-              </div>
-              <button
-                type="submit"
-
-                disabled={applying}
-                className="w-full rounded-lg bg-primary-600 px-4 py-2 text-xs font-semibold text-white shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-400 transition disabled:cursor-not-allowed disabled:opacity-50"
-                aria-busy={applying}
-              >
-                {applying ? (
-                  <span className="flex items-center justify-center"><svg className="animate-spin h-5 w-5 mr-2 text-white" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" /></svg>Submitting...</span>
-                ) : 'Submit application'}
-              </button>
-            </form>
-          </div>
-        )}
+        // ...existing code...
       </div>
     </div>
   </div>

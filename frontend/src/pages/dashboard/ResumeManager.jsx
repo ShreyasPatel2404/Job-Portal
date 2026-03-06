@@ -8,11 +8,8 @@ const ResumeManager = () => {
   const [resumes, setResumes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [resumeData, setResumeData] = useState({
-    url: '',
-    title: '',
-    description: '',
-  });
+  const [file, setFile] = useState(null);
+  const [isDefault, setIsDefault] = useState(true);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
 
@@ -32,9 +29,9 @@ const ResumeManager = () => {
     }
   };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setResumeData((prev) => ({ ...prev, [name]: value }));
+  const handleFileChange = (e) => {
+    const selected = e.target.files?.[0] ?? null;
+    setFile(selected);
   };
 
   const handleUpload = async (e) => {
@@ -42,12 +39,23 @@ const ResumeManager = () => {
     setUploading(true);
     setError('');
     try {
-      await resumeService.uploadResume(resumeData);
-      setResumeData({ url: '', title: '', description: '' });
+      if (!file) {
+        setError('Please select a PDF, DOC, or DOCX file.');
+        setUploading(false);
+        return;
+      }
+      await resumeService.uploadResume({ file, isDefault });
+      setFile(null);
+      setIsDefault(true);
       fetchResumes();
       setShowForm(false);
     } catch (err) {
-      setError('Failed to upload resume');
+      // Show more specific error message from backend if available
+      const errorMessage = err.response?.data?.message || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Failed to upload resume. Please check file size and format.';
+      setError(errorMessage);
     } finally {
       setUploading(false);
     }
@@ -104,24 +112,38 @@ const ResumeManager = () => {
               className="glass-card rounded-2xl p-6 border border-slate-200 dark:border-zinc-800 bg-white/50 dark:bg-zinc-900/50 overflow-hidden"
               onSubmit={handleUpload}
             >
-              <h3 className="text-lg font-semibold mb-4">Add New Resume</h3>
+              <h3 className="text-lg font-semibold mb-4">Add New Resume (Upload PDF/DOC/DOCX)</h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1.5" htmlFor="url">Resume URL (PDF/Doc)</label>
+                  <label className="block text-sm font-medium mb-1.5" htmlFor="file">
+                    Resume File
+                  </label>
                   <div className="relative">
-                    <Globe className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input id="url" name="url" value={resumeData.url} onChange={handleChange} required className="w-full pl-10 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="https://..." />
+                    <Upload className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      id="file"
+                      name="file"
+                      type="file"
+                      accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      onChange={handleFileChange}
+                      required
+                      className="w-full pl-10 px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all file:mr-4 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
+                    />
                   </div>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Allowed types: PDF, DOC, DOCX. Max size is configured in the backend.
+                  </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5" htmlFor="title">Title</label>
-                    <input id="title" name="title" value={resumeData.title} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="e.g. Frontend Dev Resume" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium mb-1.5" htmlFor="description">Description</label>
-                    <input id="description" name="description" value={resumeData.description} onChange={handleChange} className="w-full px-4 py-2.5 rounded-xl border border-gray-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 focus:ring-2 focus:ring-primary/20 outline-none transition-all" placeholder="Optional notes" />
-                  </div>
+                <div className="flex items-center justify-between gap-4">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={isDefault}
+                      onChange={(e) => setIsDefault(e.target.checked)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary/30"
+                    />
+                    <span>Set as my default resume</span>
+                  </label>
                 </div>
                 {error && <div className="text-red-500 text-sm font-medium bg-red-50 dark:bg-red-900/10 p-2 rounded-lg">{error}</div>}
                 <div className="flex justify-end pt-2">
@@ -159,13 +181,34 @@ const ResumeManager = () => {
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        {resume.title}
+                        {resume.fileName || 'Resume file'}
                         {resume.isDefault && <span className="px-2 py-0.5 rounded-full bg-primary text-white text-[10px] uppercase tracking-wider font-bold">Default</span>}
                       </h4>
                       <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                        <span>{resume.description || 'No description'}</span>
-                        <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-zinc-700" />
-                        <a href={resume.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">View File</a>
+                        {resume.fileSize != null && (
+                          <span>
+                            {(resume.fileSize / 1024).toFixed(1)} KB
+                          </span>
+                        )}
+                        {resume.fileType && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-zinc-700" />
+                            <span className="uppercase">{resume.fileType}</span>
+                          </>
+                        )}
+                        {resume.fileUrl && (
+                          <>
+                            <span className="w-1 h-1 rounded-full bg-gray-300 dark:bg-zinc-700" />
+                            <a
+                              href={resume.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline font-medium"
+                            >
+                              View File
+                            </a>
+                          </>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -198,8 +241,14 @@ const ResumeManager = () => {
               <FileText className="w-8 h-8 text-gray-400" />
             </div>
             <h3 className="text-lg font-semibold mb-1">No resumes found</h3>
-            <p className="text-muted-foreground mb-4">Upload a resume to start applying for jobs.</p>
-            <button onClick={() => setShowForm(true)} className="text-primary font-semibold hover:underline">Upload your first resume</button>
+            <p className="text-muted-foreground mb-6">Upload a resume to start applying for jobs.</p>
+            <button 
+              onClick={() => setShowForm(true)} 
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-semibold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:shadow-primary/30"
+            >
+              <Upload className="w-5 h-5" />
+              Upload your first resume
+            </button>
           </div>
         )}
       </div>
