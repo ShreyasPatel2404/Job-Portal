@@ -64,10 +64,15 @@ public class ChatService {
                     OllamaOptions.create().withTemperature(0.2f).withModel("llama3")
             );
 
+            log.info("Calling Ollama with prompt length: {}", prompt.getContents().length());
             org.springframework.ai.chat.ChatResponse aiResponse = chatClient.call(prompt);
-            String aiText = aiResponse.getResult().getOutput().getContent();
+            String rawAiText = aiResponse.getResult().getOutput().getContent();
+            log.debug("Raw AI Response: {}", rawAiText);
+
+            String aiText = JSONValidatorUtil.extractJson(rawAiText);
 
             if (!JSONValidatorUtil.isValidResponse(aiText)) {
+                log.warn("Invalid JSON response from AI. Raw text followed by extracted: \nRaw: {}\nExtracted: {}", rawAiText, aiText);
                 return fallbackService.handleFallback(message);
             }
 
@@ -77,7 +82,7 @@ public class ChatService {
             return response;
 
         } catch (Exception e) {
-            log.error("Chat processing failed: {}", e.getMessage());
+            log.error("Chat processing failed for user {}: {} StackTrace: {}", user.getEmail(), e.getMessage(), e.getStackTrace()[0]);
             return fallbackService.handleFallback(message);
         }
     }
@@ -235,7 +240,12 @@ public class ChatService {
     }
 
     private void handleCandidateSearch(ChatResponse response) {
-        response.setData(userRepository.findByAccountType(com.jobportal.dto.AccountType.APPLICANT));
+        List<String> requestedSkills = (List<String>) response.getData();
+        if (requestedSkills != null && !requestedSkills.isEmpty()) {
+            response.setData(userRepository.searchCandidatesBySkills(requestedSkills));
+        } else {
+            response.setData(userRepository.findByAccountType(com.jobportal.dto.AccountType.APPLICANT));
+        }
     }
 
     private void handleJobTrend(ChatResponse response) {

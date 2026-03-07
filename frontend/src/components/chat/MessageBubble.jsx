@@ -183,6 +183,29 @@ const MessageBubble = ({ message }) => {
                         </div>
                     </div>
                 );
+            case 'CANDIDATE_SEARCH':
+                return (
+                    <div className="mt-3 space-y-2">
+                        {message.data.map((candidate, idx) => (
+                            <div key={idx} className="p-3 bg-white/50 rounded-xl border border-green-100 flex items-center gap-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold text-xs">
+                                    {candidate.name ? candidate.name.split(' ').map(n => n[0]).join('') : 'U'}
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <div className="font-semibold text-green-800 text-sm truncate">{candidate.name}</div>
+                                    <div className="text-[10px] text-gray-500 truncate">{candidate.email}</div>
+                                    <div className="flex flex-wrap gap-1 mt-1">
+                                        {(candidate.skills || []).slice(0, 3).map((s, i) => (
+                                            <span key={i} className="text-[8px] px-1.5 py-0.5 bg-green-50 text-green-600 rounded-full border border-green-100 uppercase">
+                                                {s}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                );
             default:
                 return null;
         }
