@@ -1,0 +1,94 @@
+{
+  "users": [
+    {
+      "role": "ADMIN",
+      "email": "admin@jobportal.com",
+      "password": "Admin@123",
+      "fullName": "System Admin",
+      "verified": true
+    },
+    {
+      "role": "EMPLOYER",
+      "email": "employer@company.com",
+      "password": "Employer@123",
+      "fullName": "Employer User",
+      "company": {
+        "name": "Tech Innovators",
+        "description": "Leading tech company",
+        "website": "https://techinnovators.com"
+      },
+      "verified": true
+    },
+    {
+      "role": "APPLICANT",
+      "email": "applicant@user.com",
+      "password": "Applicant@123",
+      "fullName": "Job Seeker",
+      "verified": true,
+      "resume": {
+        "fileName": "resume.pdf",
+        "url": "/resumes/applicant_resume.pdf"
+      }
+    }
+  ],
+  "jobs": [
+    {
+      "title": "Full Stack Developer",
+      "description": "Develop and maintain web applications.",
+      "company": "Tech Innovators",
+      "location": "Remote",
+      "type": "Full-time",
+      "postedBy": "employer@company.com",
+      "requirements": ["Java", "React", "MongoDB"],
+      "salary": "120000",
+      "status": "OPEN"
+    },
+    {
+      "title": "Frontend Engineer",
+      "description": "Work on UI/UX for our main product.",
+      "company": "Tech Innovators",
+      "location": "Onsite",
+      "type": "Contract",
+      "postedBy": "employer@company.com",
+      "requirements": ["React", "Tailwind CSS"],
+      "salary": "90000",
+      "status": "OPEN"
+    }
+  ],
+  "applications": [
+    {
+      "jobTitle": "Full Stack Developer",
+      "applicant": "applicant@user.com",
+      "status": "SUBMITTED",
+      "resume": "/resumes/applicant_resume.pdf"
+    }
+  ],
+  "savedJobs": [
+    {
+      "applicant": "applicant@user.com",
+      "jobTitle": "Frontend Engineer"
+    }
+  ],
+  "notifications": [
+    {
+      "recipient": "applicant@user.com",
+      "message": "Your application for Full Stack Developer has been submitted.",
+      "read": false
+    },
+    {
+      "recipient": "employer@company.com",
+      "message": "New application received for Full Stack Developer.",
+      "read": false
+    }
+  ],
+  "companyReviews": [
+    {
+      "company": "Tech Innovators",
+      "author": "applicant@user.com",
+      "title": "Great place to work!",
+      "comment": "Supportive team and lots of learning opportunities.",
+      "rating": 5,
+      "createdAt": "2026-01-03T10:00:00Z"
+    }
+  ]
+}
