@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.jobportal</groupId>
-	<artifactId>JobPortal-V2</artifactId>
-	<version>1.0.0-RELEASE</version>
-	<name>Job-Portal-V2</name>
-	<description>Backend for Job Portal V2 Server</description>
+	<artifactId>JobPortal</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Job-Portal</name>
+	<description>Backend for Job Portal</description>
 	<url/>
 	<licenses>
 		<license/>
