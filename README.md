@@ -1,12 +1,12 @@
-# Job Portal System - Version 2.0 (Core Engine)
+AI-Based Job Portal System
 
-> The Next-Generation, intelligent recruitment platform powered by Advanced AI to match job seekers with relevant opportunities efficiently and securely.
+> An intelligent recruitment platform that uses Artificial Intelligence to match job seekers with relevant opportunities efficiently and securely.
 
 
 
-📌 Project Overview (V2.0)
+📌 Project Overview
 
-The AI-Based Job Portal System V2 is a significantly upgraded full-stack web application designed to revolutionize the recruitment process. It uses AI-driven analysis to understand resumes and job descriptions, enabling smart job recommendations and efficient candidate shortlisting.
+The AI-Based Job Portal System is a full-stack web application designed to modernize the recruitment process. It uses AI-driven analysis to understand resumes and job descriptions, enabling smart job recommendations and efficient candidate shortlisting.
 
 This project focuses on scalability, security, and intelligent automation using modern technologies.
 
