@@ -42,3 +42,6 @@ backend.log
 build.log
 build_compile.log
 frontend.zip
+uploads/
+*.pem
+*.key
